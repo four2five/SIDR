@@ -35,7 +35,7 @@
     <pathelement location="${env.HADOOP_HOME}/build/hadoop-1.0.4-early-results/share/hadoop/lib/commons-logging-1.1.1.jar"/> 
     <pathelement location="/usr/share/java/ant-contrib.jar"/>  
     <!-- <pathelement location="${env.NETCDF_HOME}/target/${env.NETCDF_JAR}" /> -->
-    <pathelement location="/home/buck/git/thredds/cdm/target/netcdf-4.3.18.jar" />
+    <pathelement location="${env.NETCDF_HOME}/cdm/target/${env.NETCDF_JAR}" />
     <!-- <pathelement location="${env.HDF5JAVA_HOME}/lib/jhdf5.jar" /> -->
     <!-- <pathelement location="${env.HADOOP_HOME}/${env.HADOOP_JAR}"/>  -->
     <!-- <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-${env.HADOOP_VERSION}.jar"/> -->
