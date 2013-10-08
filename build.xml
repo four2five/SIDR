@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<!--
+   The following environment variables are expected to be set:
+     1) HADOOP_HOME     := root of hadoop tree
+     2) HADOOP_VERSION  := version of hadoop (for hadoop-VERSION-core.jar)
+     3) NETCDF_HOME     := Damasc NetCDF library (e.g.
+   You may have to adjust the names of the Hadoop JAR files listed in the
+   classpath below depending on the version of Hadoop being used.
+-->
+
+<project name="SIDR" default="main">
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+	<property name="properties.filename" value="file_formats.properties" />
+  <property name="src.dir" value="src"/>
+  <property name="doc.dir" value="docs"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="build.dir" value="build"/>
+  <property name="classes.dir" value="${build.dir}/classes"/>
+  <property name="classes.tmp.dir" value="${build.dir}/classes-tmp"/>
+  <property name="jar.dir" value="${build.dir}/jar"/>
+  <property name="generator.file" value="edu/ucsc/srl/damasc/hadoop/GenerateMainTool.java" />        
+  <property name="generated.file" value="edu/ucsc/srl/damasc/hadoop/CoreTool.java" />        
+  <property name="generator.main.class" value="edu.ucsc.srl.damasc.hadoop.GenerateMainTool" />        
+  <property name="main-class" value="edu.ucsc.srl.damasc.hadoop.CoreTool" /> 
+  <property environment="env"/>
+
+
+<!--
+  <condition property="netcdf_path" value="${env.NETCDF_HOME}" else="../../netcdf/netcdf-damasc/netcdf-java/trunk/">
+      <isset property="env.NETCDF_HOME"/>
+  </condition>
+-->
+  <path id="classpath">
+    <pathelement location="${env.HADOOP_HOME}/build/${env.HADOOP_JAR}"/>  
+    <pathelement location="${env.HADOOP_HOME}/build/hadoop-1.0.4-early-results/share/hadoop/lib/commons-logging-1.1.1.jar"/> 
+    <pathelement location="/usr/share/java/ant-contrib.jar"/>  
+    <!-- <pathelement location="${env.NETCDF_HOME}/target/${env.NETCDF_JAR}" /> -->
+    <pathelement location="${env.NETCDF_HOME}/cdm/target/${env.NETCDF_JAR}" />
+    <!-- <pathelement location="${env.HDF5JAVA_HOME}/lib/jhdf5.jar" /> -->
+    <!-- <pathelement location="${env.HADOOP_HOME}/${env.HADOOP_JAR}"/>  -->
+    <!-- <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-${env.HADOOP_VERSION}.jar"/> -->
+    <!-- <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-1.1.2.jar"/> -->
+    <!--<pathelement location="${env.HADOOP_HOME}/${env.HADOOP_JAR}"/>-->
+    <!-- <pathelement location="${env.HDF5_JAVA_HOME}/lib/${env.HDF5_JAVA_JAR}" /> -->
+    <!-- <pathelement location="/usr/share/java/hadoop-cephfs.jar" /> -->
+    <!--
+    <pathelement location="/home/buck/svn/early_results/lib/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
+    -->
+  </path>
+
+  <target name="generate-main" depends="init,write-properties-file">
+    <mkdir dir="${classes.tmp.dir}"/>
+    <javac
+      sourcepath=""
+      srcdir="${src.dir}" 
+      destdir="${classes.tmp.dir}"
+      debug="true"
+      includeantruntime="false">
+      <include name="${generator.file}" /> 
+      <compilerarg value="-Xlint"/>
+      <classpath refid="classpath"/>
+    </javac>
+
+    <!-- Now execute that class file -->
+    <echo> Generating CoreTool.java </echo>
+    <java classname="${generator.main.class}" classpath="${classes.tmp.dir}" >
+      <arg value="${src.dir}/${generated.file}" />
+    </java>
+  </target>
+
+  <target name="init">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${jar.dir}"/>
+    <mkdir dir="${doc.dir}"/>
+  </target>
+
+  <target name="compile-core" depends="init,write-properties-file,generate-main">
+
+    <fileset id="files.to.exclude" dir="${src.dir}" >
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFFileInputFormat.java" unless="build.netcdf" /> 
+      <include name="edu/ucsc/srl/damasc/hadoop/io/output/NetCDFFileOutputFormat.java" unless="build.netcdf" />
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFRecordReader.java" unless="build.netcdf" />
+      <include name="edu/ucsc/srl/damasc/hadoop/io/NetCDFTools.java" unless="build.netcdf" /> 
+      <include name="edu/ucsc/srl/damasc/hadoop/tools/netcdf/**" unless="build.netcdf" />
+
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSFileInputFormat.java" unless="build.netcdf_hdfs" /> 
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSRecordReader.java" unless="build.netcdf_hdfs" />
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSCoordinateVariableRecordReader.java" unless="build.netcdf_hdfs" />
+      <include name="edu/ucsc/srl/damasc/hadoop/io/NetCDFHDFSTools.java" unless="build.netcdf_hdfs" /> 
+      <include name="edu/ucsc/srl/damasc/hadoop/io/NcHdfsRaf.java" unless="build.netcdf_hdfs" /> 
+      <include name="edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs/**" unless="build.netcdf_hdfs" />
+
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/HDF5FileInputFormat.java" unless="build.hdf5"/>
+      <include name="edu/ucsc/srl/damasc/hadoop/io/output/HDF5FileOutputFormat.java" unless="build.hdf5"/>
+      <include name="edu/ucsc/srl/damasc/hadoop/io/input/HDF5RecordReader.java" unless="build.hdf5"/>
+      <include name="edu/ucsc/srl/damasc/hadoop/HDF5Utils.java" unless="build.hdf5"/>
+      <include name="edu/ucsc/srl/damasc/hadoop/io/HDF5Tools.java" unless="build.hdf5"/>
+      <include name="edu/ucsc/srl/damasc/hadoop/tools/hdf5/**" unless="build.hdf5"/>
+    </fileset>
+
+  <!--
+    <fileset id="files.to.build" dir="${src.dir}" >
+      <include name="**/*.java" /> 
+
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFFileInputFormat.java" unless="build.netcdf" /> 
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFFileOutputFormat.java" unless="build.netcdf" />
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFRecordReader.java" unless="build.netcdf" />
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/NetCDFTools.java" unless="build.netcdf" /> 
+      <exclude name="edu/ucsc/srl/damasc/hadoop/tools/netcdf/**" unless="build.netcdf" />
+
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/HDF5FileInputFormat.java" unless="build.hdf5"/>
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/HDF5FileOutputFormat.java" unless="build.hdf5"/>
+      <exclude name="edu/ucsc/srl/damasc/hadoop/io/input/HDF5RecordReader.java" unless="build.hdf5"/>
+      <exclude name="edu/ucsc/srl/damasc/hadoop/tools/hdf5/**" unless="build.hdf5"/>
+    </fileset>
+    <pathconvert pathsep=":" property="my.file.set" refid="files.to.build">
+      <map from="/home/buck/svn/scihadoop/hdf5_scihadoop/src/" to=""/> 
+    </pathconvert>
+
+-->
+    <pathconvert pathsep="," property="my.exclude.set" refid="files.to.exclude">
+      <!-- <map from="/home/buck/svn/scihadoop/hdf5_scihadoop/src/" to=""/>  -->
+      <map from="${user.dir}/src/" to=""/> 
+    </pathconvert>
+
+    <echo message="my.file.set= ${my.file.set}"/>
+    <echo message="my.exclude.set= ${my.exclude.set}"/>
+    <echo message="files.to.build = ${files.to.build}"/>
+    <echo message="files.to.exclude = ${files.to.exclude}"/>
+
+    <path id="foo">
+      <pathelement path="${src.dir}" /> 
+      <pathelement path="${lib.dir}" /> 
+    </path>
+
+    <property name="bar" refid="foo" />
+    <echo message="bar = ${bar}"/>
+
+    <!-- <property name="src.filter.ref" refid="my.file.set" />  -->
+    <!-- <property name="src.filter.ref2" refid="files.to.build" /> -->
+
+
+      <!-- srcdir="${src.dir}"   -->
+    <javac
+      sourcepath=""
+      srcdir="${src.dir}"
+      destdir="${classes.dir}"
+      debug="true"
+      includeantruntime="false"
+      excludes="${my.exclude.set}" >
+      <exclude name="${my.exclude.set}" /> 
+      <!-- <include name="${my.file.set}" />  -->
+      <!-- <src name="files.to.build"/> -->
+      <!-- <src id="${src.filter.ref}" /> -->
+      <compilerarg value="-Xlint"/>
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <!-- <target name="netcdf" depends="compile-generate-main-tool,compile-core"> -->
+  <target name="netcdf">
+    <property name="build.netcdf" value="true"/>
+  </target>
+
+  <target name="netcdf_hdfs">
+    <property name="build.netcdf_hdfs" value="true"/>
+  </target>
+
+  <!-- <target name="hdf5" depends="compile-generate-main-tool,compile-core"> -->
+  <target name="hdf5">
+    <property name="build.hdf5" value="true"/>
+  </target>
+
+  <target name="debug">
+    <if>
+      <isset property="build.netcdf"/>
+      <then>
+        <echo> "DO build netcdf" </echo>
+      </then>
+      <else>
+        <echo> "DO NOT build netcdf" </echo>
+      </else>
+    </if>
+    <if>
+      <isset property="build.netcdf_hdfs"/>
+      <then>
+        <echo> "DO build netcdf_hdfs" </echo>
+      </then>
+      <else>
+        <echo> "DO NOT build netcdf_hdfs" </echo>
+      </else>
+    </if>
+    <if>
+      <isset property="build.hdf5"/>
+      <then>
+        <echo> "DO build hdf5" </echo>
+      </then>
+      <else>
+        <echo> "DO NOT build hdf5" </echo>
+      </else>
+    </if>
+  </target>
+
+  <target name="jar" depends="compile-core">
+
+    <!-- flatten classpath first -->
+    <!-- convert classpath to a flat list/string for use in manifest task -->
+    <!--
+    <pathconvert property="myclasspath" pathsep=" ">
+        <path refid="classpath" />
+    </pathconvert>
+    -->
+    <pathconvert pathsep=" " property="classpath.manifest" refid="classpath" />
+
+    <!-- <property name="myclasspath" refid="classpath"/> -->
+    <!-- Emit the property to the ant console -->
+    <echo message="Classpath = ${classpath.manifest}"/>
+
+    <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="${main-class}"/> 
+        <!-- <attribute name="Main-Class" value="edu.ucsc.srl.damasc.hadoop.io.input.TestNetCDFFileInputFormat"/>  -->
+        <attribute name="Class-Path" value="${classpath.manifest}" />
+      </manifest>
+      <fileset dir="${classes.dir}" includes="**/*.class" />
+    </jar>
+  </target>
+
+  <target name="run" depends="jar">
+    <java fork="true" classname="${main-class}" >
+      <classpath>
+        <path refid="classpath"/>
+        <path id="application" location="${jar.dir}/${ant.project.name}.jar" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${doc.dir}"/>
+    <delete file="${src.dir}/${generated.file}"/>
+    <delete file="${properties.filename}"/>
+  </target>
+
+  <target name="main" depends="clean,jar,run"/>
+
+  <target name="docs" depends="init">
+    <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${doc.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.java" />
+      </fileset>
+    </javadoc>
+  </target>
+
+  <target name="write-properties-file">
+	    <if>
+	      <isset property="build.netcdf"/>
+	      <then>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="netcdf" type="string" value="true" />
+          </propertyfile>
+	      </then>
+	      <else>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="netcdf" type="string" value="false" />
+          </propertyfile>
+	      </else>
+	    </if>
+	    <if>
+	      <isset property="build.netcdf_hdfs"/>
+	      <then>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="netcdf_hdfs" type="string" value="true" />
+          </propertyfile>
+	      </then>
+	      <else>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="netcdf_hdfs" type="string" value="false" />
+          </propertyfile>
+	      </else>
+	    </if>
+	    <if>
+	      <isset property="build.hdf5"/>
+	      <then>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="hdf5" type="string" value="true" />
+          </propertyfile>
+	      </then>
+	      <else>
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
+            <entry key="hdf5" type="string" value="false" />
+          </propertyfile>
+	      </else>
+	    </if>
+  </target>
+
+</project>
