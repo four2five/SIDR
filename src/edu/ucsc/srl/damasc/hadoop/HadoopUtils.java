@@ -198,6 +198,10 @@ public class HadoopUtils {
         //if( !variableShapeSet) {
 
             String dimString = conf.get(VARIABLE_SHAPE_PREFIX, "");
+            // sanity checking
+            if (dimString == "") { 
+              return null;
+            }
 
             String[] dimStrings = dimString.split(",");
             variableShape = new int[dimStrings.length];
@@ -1370,6 +1374,10 @@ public class HadoopUtils {
 
   public static int[] getTotalOutputSpace(Configuration conf) { 
     int[] variableShape = getVariableShape(conf);
+    // sanity checking
+    if (variableShape == null) { 
+      return null;
+    }
     int[] extractionShape = getExtractionShape(conf, variableShape.length);
 
     int[] outputSpace = new int[variableShape.length];
@@ -1488,7 +1496,9 @@ public class HadoopUtils {
     int[] totalOutputShape = getTotalOutputSpace(conf);
     if( null == totalOutputShape) { 
     	LOG.warn("getReducerWriteCorner: totalOutputShape is NULL");
+      return null;
     }
+
     int[] returnCorner = new int[totalOutputShape.length];
 
     int numReducers = getNumberReducers(conf);
@@ -1522,6 +1532,10 @@ public class HadoopUtils {
                                             Configuration conf ) throws IOException { 
 
     int[] totalOutputSpace = getTotalOutputSpace(conf);
+    // sanity check
+    if (totalOutputSpace == null) { 
+      return null;
+    }
     int[] returnShape = Arrays.copyOf(totalOutputSpace , totalOutputSpace.length);
 
     int numReducers = getNumberReducers(conf);
@@ -1720,6 +1734,11 @@ public class HadoopUtils {
 	    e.printStackTrace();
 	    outputWriteShape = null;
     }
+
+    if (outputWriteShape == null) { 
+      return null;
+    }
+
     long maxKeysPerReducer = getReducerKeyLimit(conf);
     int recordDim;
 

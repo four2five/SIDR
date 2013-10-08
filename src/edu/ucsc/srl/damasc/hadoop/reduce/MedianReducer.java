@@ -49,6 +49,14 @@ public class MedianReducer extends
     int[] outputCornerForThisReducer = 
       HadoopUtils.getOutputCornerForReducerN(task.getId(), conf );
 
+    // if this happens, something is seriously wrong.
+    // Basically, we should punt as we can't process
+    // data correctly
+    if (null == outputCornerForThisReducer) { 
+      this._extractionShape = null;
+      return;
+    }
+
     int numReducers = HadoopUtils.getNumberReducers(conf);
 
     int[] outputShapeForThisReducer = 
@@ -66,6 +74,8 @@ public class MedianReducer extends
                     " totalOutputSpace: " + Arrays.toString(totalGlobalOutputSpace));
     //int[] mapTasks = HDF5HadoopUtils.getMapTasksForReducer(taskID, context.getConfiguration());
   }
+
+
   /**
    * Iterates through the data it is passed, doing nothing to it. Outputs a 
    * Integer.MINIMUM_VALUE as the value for its key
@@ -79,14 +89,13 @@ public class MedianReducer extends
                      Context context)
                      throws IOException, InterruptedException {
 
-    //System.out.println("in reducer, key: " + key.toString() );
+    // sanity test, bail if extraction shape is null
+    if (null == this._extractionShape) { 
+      return;
+    }
+
     long timer = System.currentTimeMillis();
 
-    // debug test
-    //LongWritable maxVal = new LongWritable();
-    //maxVal.set(Long.MIN_VALUE);
-
-    //IntWritable intW = new IntWritable();
     HolisticResult holResult = null;
 
     try{ 

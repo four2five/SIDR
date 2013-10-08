@@ -888,6 +888,13 @@ public abstract class NetCDFHDFSCoreFileInputFormat
 
       Variable var = getVariable(file, conf); 
 
+      // -jbuck here
+      if (var == null) { 
+        LOG.error("Could not find "  + Utils.getVariableName(conf) + 
+                  " in file " + file.getPath());
+        continue;
+      }
+
       if ( startOffset == null ){
         startOffset = new int[var.getDimensions().size()];
         for( int i=0; i<startOffset.length; i++) {

@@ -531,7 +531,11 @@ public abstract class ArrayBasedFileInputFormat
     for( int i=0; i<numReducers; i++) { 
       tempCorner = HadoopUtils.getReducerWriteCorner(i, conf); 
       tempShape = HadoopUtils.getReducerWriteShape(i, conf); 
-      reducerArraySpecs.add(new ArraySpec(tempCorner, tempShape, "", ""));
+      if (tempShape == null || tempCorner == null) { 
+        reducerArraySpecs.add(null);
+      } else { 
+        reducerArraySpecs.add(new ArraySpec(tempCorner, tempShape, "", ""));
+      }
     }
 
     ArraySpec[] arraySpecArray = 
@@ -541,8 +545,14 @@ public abstract class ArrayBasedFileInputFormat
     
     Iterator<ArraySpec> itr = reducerArraySpecs.iterator();
     int counter = 0;
+    ArraySpec tempSpec;
     while(itr.hasNext()) { 
-      System.out.println("Reducer:[" + counter + "]:" + itr.next().toString());
+      tempSpec = itr.next();
+      if (tempSpec == null) { 
+        System.out.println("Reducer:[" + counter + "]:" + " has null specs");
+      } else { 
+        System.out.println("Reducer:[" + counter + "]:" + itr.next().toString());
+      }
       counter++;
     }
     
