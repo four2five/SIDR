@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs
+END
+CoordVarFilter.java
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs/CoordVarFilter.java
+END
+Filter.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs/Filter.java.er
+END
+Median.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs/Median.java
+END
+Average.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/damasc/!svn/ver/1951/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/tools/netcdf_hdfs/Average.java.fixme
+END

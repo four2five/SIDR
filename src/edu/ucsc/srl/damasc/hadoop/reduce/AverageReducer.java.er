@@ -1,0 +1,110 @@
+package edu.ucsc.srl.damasc.hadoop.reduce;
+
+import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.hadoop.mapreduce.TaskID;
+
+import edu.ucsc.srl.damasc.hadoop.HadoopUtils;
+import edu.ucsc.srl.damasc.hadoop.Utils;
+import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
+import edu.ucsc.srl.damasc.hadoop.io.AverageResult;
+//import edu.ucsc.srl.damasc.hadoop.HDF5Utils;
+
+/**
+ * Reducer that simply iterates through the data it is passed
+ */
+public class AverageReducer extends 
+        Reducer<ArraySpec, AverageResult, ArraySpec, IntWritable> {
+
+  @SuppressWarnings("unused")
+private static final Log LOG = LogFactory.getLog(AverageReducer.class);
+
+  public void setup(Context context) throws IOException, InterruptedException { 
+    super.setup(context);
+
+    //int taskID = Utils.parseTaskID( context.getTaskAttemptID().toString()); 
+    //System.out.println("in reducer.setup(), calling getMapTasksForReducer");
+    TaskAttemptID attempt = context.getTaskAttemptID();
+    TaskID task = attempt.getTaskID();
+
+
+    System.out.println("in reduce().setup for task: " + task.getId());
+
+
+    int[] outputCornerForThisReducer = 
+      HadoopUtils.getOutputCornerForReducerN(task.getId(), context.getConfiguration() );
+
+    int numReducers = Utils.getNumberReducers(context.getConfiguration());
+
+    int[] outputShapeForThisReducer = 
+      HadoopUtils.getReducerWriteShape( task.getId(), context.getConfiguration());
+
+    int[] totalGlobalOutputSpace = Utils.getTotalOutputSpace(context.getConfiguration());
+
+    /*
+    if( taskID == (numReducers - 1) )
+      outputShapeForThisReducer = Utils.correctArray(outputCornerForThisReducer, 
+                                                     outputShapeForThisReducer, 
+                                                     context.getConfiguration());
+    */
+
+    System.out.println("Reduce(): " + task.getId() + " of " + numReducers + 
+                    " write corner: " +  Utils.arrayToString(outputCornerForThisReducer) + 
+                    " shape: " + Utils.arrayToString(outputShapeForThisReducer) + 
+                    " totalOutputSpace: " + Utils.arrayToString(totalGlobalOutputSpace));
+    //int[] mapTasks = HDF5Utils.getMapTasksForReducer(taskID, context.getConfiguration());
+  }
+  /**
+   * Iterates through the data it is passed, doing nothing to it. Outputs a 
+   * Integer.MINIMUM_VALUE as the value for its key
+   * @param key the flattened corner for this instance of the extraction shape 
+   * in the global logical space
+   * @param values an Iterable list of IntWritable objects that represent all the inputs
+   * for this key
+   * @param context the Context object for the executing program
+   */
+  public void reduce(ArraySpec key, Iterable<AverageResult> values, 
+                     Context context)
+                     throws IOException, InterruptedException {
+
+    //System.out.println("in reducer, key: " + key.toString() );
+    long timer = System.currentTimeMillis();
+
+    // debug test
+    //LongWritable maxVal = new LongWritable();
+    //maxVal.set(Long.MIN_VALUE);
+
+    ArraySpec prevKey = new ArraySpec();
+    IntWritable intW = new IntWritable();
+    AverageResult aRes = new AverageResult();
+    long groupCount = 0;
+    // long groupTotal = 0;
+    // empty loop
+    for (AverageResult value : values) {
+      aRes.addAverageResult(value);
+      //groupTotal += value.get();
+      groupCount++;
+
+      /*
+      if( key.getCorner().length < 4) { 
+        System.out.println("key.getCorner().length < 4. It's " + key.getCorner().length);
+        System.out.println("prevGroupID: " + Utils.arrayToString(prevKey.getCorner()));
+      }
+      */
+
+      prevKey.setCorner(key.getCorner());
+    }
+
+    intW.set(aRes.getCurrentValue());
+    context.write(key, intW, groupCount);
+    //System.out.println("Group: " + Arrays.toString(key.getGroupID()) + " combined " + groupCount + " intermediate results");
+
+    timer = System.currentTimeMillis() - timer;
+    //LOG.info("total reducer took: " + timer + " ms");
+  }
+}

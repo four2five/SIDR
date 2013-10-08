@@ -1,0 +1,149 @@
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/damasc/!svn/ver/1965/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io
+END
+IntArrayWritable.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/IntArrayWritable.java
+END
+DataIterator.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/damasc/!svn/ver/1965/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/DataIterator.java
+END
+NetCDFTools.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/damasc/!svn/ver/1915/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NetCDFTools.java
+END
+HadoopArraySpec.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HadoopArraySpec.java
+END
+NetCDFHDFSTools.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NetCDFHDFSTools.java
+END
+ArraySpec.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/damasc/!svn/ver/1953/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/ArraySpec.java
+END
+HDF5ArraySpecGen.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HDF5ArraySpecGen.java
+END
+GroupID2.java.removed
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/damasc/!svn/ver/1821/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/GroupID2.java.removed
+END
+MultiVarData.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/damasc/!svn/ver/1965/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/MultiVarData.java
+END
+NcHdfsRaf.java.set_aside
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/damasc/!svn/ver/1889/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NcHdfsRaf.java.set_aside
+END
+NcHdfsRaf.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/damasc/!svn/ver/1919/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NcHdfsRaf.java
+END
+NetCDFGroupIDGen.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/damasc/!svn/ver/1361/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NetCDFGroupIDGen.java.fixme
+END
+HolisticResult2.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HolisticResult2.java
+END
+NcCephRaf.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/damasc/!svn/ver/1461/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/NcCephRaf.java.fixme
+END
+GID.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/damasc/!svn/ver/1773/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/GID.java
+END
+HadoopGroupID.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HadoopGroupID.java
+END
+HDF5Tools.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/damasc/!svn/ver/1904/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HDF5Tools.java
+END
+GroupID.java.removed
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/damasc/!svn/ver/1821/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/GroupID.java.removed
+END
+AverageResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/AverageResult.java
+END
+ExtractionShapeIterator.java
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/ExtractionShapeIterator.java
+END
+CoordVariable.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/damasc/!svn/ver/1953/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/CoordVariable.java
+END
+HolisticResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/HolisticResult.java
+END
+Result.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/damasc/!svn/ver/1854/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/Result.java
+END
+SHFileStatus.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/damasc/!svn/ver/1397/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/SHFileStatus.java
+END

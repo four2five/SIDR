@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/damasc/!svn/ver/1965/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input
+END
+NetCDFHDFSFileInputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn/damasc/!svn/ver/1951/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSFileInputFormat.java
+END
+HDF5FileSplit.java.setaside
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/damasc/!svn/ver/1772/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/HDF5FileSplit.java.setaside
+END
+NetCDFRecordReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svn/damasc/!svn/ver/1893/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFRecordReader.java
+END
+ArrayBasedFileInputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/ArrayBasedFileInputFormat.java
+END
+HDF5RecordReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/damasc/!svn/ver/1907/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/HDF5RecordReader.java
+END
+NetCDFHDFSCoordinateVariableRecordReader.java.setaside
+K 25
+svn:wc:ra_dav:version-url
+V 163
+/svn/damasc/!svn/ver/1951/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSCoordinateVariableRecordReader.java.setaside
+END
+ArrayBasedFileSplit.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/ArrayBasedFileSplit.java
+END
+NetCDFHDFSCoreFileInputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 143
+/svn/damasc/!svn/ver/1953/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSCoreFileInputFormat.java
+END
+NetCDFHDFSRecordReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/damasc/!svn/ver/1965/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSRecordReader.java
+END
+NetCDFFileInputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/damasc/!svn/ver/1904/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFFileInputFormat.java
+END
+HDF5FileInputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/damasc/!svn/ver/1904/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/HDF5FileInputFormat.java
+END
+NetCDFHDFSCoordinateVariableFileInputFormat.java.setaside
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svn/damasc/!svn/ver/1951/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/input/NetCDFHDFSCoordinateVariableFileInputFormat.java.setaside
+END

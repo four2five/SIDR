@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/output
+END
+NetCDFFileOutputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/damasc/!svn/ver/1915/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/output/NetCDFFileOutputFormat.java
+END
+SimformFileOutputFormat.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/output/SimformFileOutputFormat.java.fixme
+END
+HDF5FileOutputFormat.java
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/damasc/!svn/ver/1915/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/io/output/HDF5FileOutputFormat.java
+END

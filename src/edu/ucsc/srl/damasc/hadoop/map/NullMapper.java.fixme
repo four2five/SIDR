@@ -1,0 +1,42 @@
+package edu.ucsc.srl.damasc.hadoop.map;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Mapper;
+
+import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
+
+/*
+import ucar.ma2.Array;
+import ucar.ma2.ArrayInt;
+*/
+
+/**
+ * Dummy mapper, just passed data through with a dummy key.
+ * This is used for testing purposes
+ */
+public class NullMapper extends Mapper<ArraySpec, Object[], ArraySpec, IntWritable> {
+
+ /**
+ * Reduces values for a given key
+ * @param key ArraySpec representing the given Array being passed in
+ * @param value an Array to process that corresponds to the given key 
+ * @param context the Context object for the currently executing job
+ */
+  public void map(ArraySpec key, Object[] inArray, Context context)
+                  throws IOException, InterruptedException {
+    try {
+      //ArrayInt intArray = (ArrayInt)value;
+      //E[] dataArray = value;
+
+      int[] dummyGID = {0};
+      ArraySpec arraySpec = new ArraySpec(dummyGID, "nullData");
+      IntWritable intW = new IntWritable(Integer.MIN_VALUE);
+
+      context.write(arraySpec, intW, (long)0);
+    } catch ( Exception e ) {
+      System.out.println("Caught an exception in NullMapper.map()" + e.toString() );
+    }
+  }
+}

@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/damasc/!svn/ver/1397/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf
+END
+MaxMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/MaxMapper.java.fixme
+END
+SimpleMedianMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/SimpleMedianMapper.java.fixme
+END
+AverageMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/AverageMapper.java.fixme
+END
+NullMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/NullMapper.java.fixme
+END
+MedianMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/MedianMapper.java.fixme
+END
+SimpleMaxMapper.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/damasc/!svn/ver/1356/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/map/netcdf/SimpleMaxMapper.java.fixme
+END

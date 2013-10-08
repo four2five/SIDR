@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/damasc/!svn/ver/1966/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop
+END
+HadoopUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/HadoopUtils.java
+END
+GenerateMainTool.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/GenerateMainTool.java
+END
+Utils.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/damasc/!svn/ver/1966/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/Utils.java
+END
+NetCDFUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/damasc/!svn/ver/1951/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/NetCDFUtils.java
+END
+HDF5Utils.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/damasc/!svn/ver/1913/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/HDF5Utils.java
+END
+NCTool_netcdf.java.fixme
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/damasc/!svn/ver/1364/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/NCTool_netcdf.java.fixme
+END

@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce
+END
+CoordVarFilterReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/CoordVarFilterReducer.java.er
+END
+FilterReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/FilterReducer.java.er
+END
+SuperSimpleMedianReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/SuperSimpleMedianReducer.java.er
+END
+SimpleMedianReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/SimpleMedianReducer.java.er
+END
+MedianReducer.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/svn/damasc/!svn/ver/1963/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/MedianReducer.java
+END
+IdentityReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/IdentityReducer.java.er
+END
+AverageReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/AverageReducer.java.er
+END
+NullReducer.java.er
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/NullReducer.java.er
+END
+CoordVarFilterReducer.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/damasc/!svn/ver/1954/software/scihadoop/branches/hdf5_scihadoop/src/edu/ucsc/srl/damasc/hadoop/reduce/CoordVarFilterReducer.java
+END

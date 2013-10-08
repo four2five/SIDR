@@ -1,0 +1,14 @@
+#!/bin/bash
+
+$HADOOP_HOME/bin/hadoop dfs -rmr /user/ceph-admin/foo
+
+# $HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/hadoop-scidata-v2.jar netcdf_hdfs_filter -D damasc.extraction_shape=1,4276737 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=vals_nod_var1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.fs_type=hdfs -D damasc.coordinate_variable_name=coordx /user/ceph-admin/paul_input/file1.nc /user/ceph-admin/foo 
+
+# need to fix the extraction shape iterator for exShape 1,1,1,1
+$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/hadoop-scidata-v2.jar netcdf_hdfs_coordvar_filter -D damasc.extraction_shape=1,1 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=3 -D damasc.variable_name=vals_nod_var1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.fs_type=hdfs -D damasc.equal_value="-0.1f" -D damasc.coordinate_variable_name=coordx -D damasc.variables_to_persist=coordx,coordy,coordz -D damasc.coordinate_variable_dimension=1 -D damasc.partitioner_class=perfilearrayspec /user/ceph-admin/paul_input/*.nc /user/ceph-admin/foo 
+
+
+# this sorta works
+#$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/hadoop-scidata-v2.jar netcdf_hdfs_filter -D damasc.extraction_shape=1,10,10,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.fs_type=hdfs -D damasc.low_filter=10000 -D damasc.high_filter=20000 /user/ceph-admin/buck_input/file1.nc /user/ceph-admin/foo 
+#$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/hadoop-scidata-v2.jar netcdf_hdfs_filter -D damasc.extraction_shape=1,1,1,1 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.fs_type=hdfs -D damasc.low_filter=10000 -D damasc.high_filter=20000 /user/ceph-admin/buck_input/file1.nc /user/ceph-admin/foo 
+
