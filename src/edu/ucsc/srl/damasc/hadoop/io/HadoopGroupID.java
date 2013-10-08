@@ -18,7 +18,7 @@ import org.apache.hadoop.io.Text;
  * Stores the instance of the extraction shape that corresponds to an
  * array. Serves as a key for the shuffle phase of MapReduce jobs. 
  */
-public class HadoopGroupID implements WritableComparable {
+public class HadoopGroupID implements WritableComparable<HadoopGroupID> {
   private int[] _groupID;  // the corner of a given extraction shape 
   private String _name;   // the variable name this data came from
 
@@ -130,9 +130,8 @@ public class HadoopGroupID implements WritableComparable {
    * if the object passed in is less than, equal to, or greater than  
    * this HadoopGroupID, respectively
    */
-  public int compareTo(Object o) {
+  public int compareTo(HadoopGroupID other) {
     int retVal = 0;
-    HadoopGroupID other = (HadoopGroupID)o;
 
     retVal = this.getRank() - other.getRank();
     if ( 0 != retVal ) 

@@ -8,7 +8,7 @@
    classpath below depending on the version of Hadoop being used.
 -->
 
-<project name="hadoop-scidata-v2" default="main">
+<project name="SIDR" default="main">
   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
   <property name="src.dir" value="src"/>
@@ -31,22 +31,21 @@
   </condition>
 -->
   <path id="classpath">
-
-    <!-- <pathelement location="${env.HDF5JAVA_HOME}/lib/jhdf5.jar" /> -->
     <pathelement location="${env.HADOOP_HOME}/build/${env.HADOOP_JAR}"/>  
+    <pathelement location="${env.HADOOP_HOME}/build/hadoop-1.0.4-early-results/share/hadoop/lib/commons-logging-1.1.1.jar"/> 
+    <pathelement location="/usr/share/java/ant-contrib.jar"/>  
+    <!-- <pathelement location="${env.NETCDF_HOME}/target/${env.NETCDF_JAR}" /> -->
+    <pathelement location="/home/buck/git/thredds/cdm/target/netcdf-4.3.18.jar" />
+    <!-- <pathelement location="${env.HDF5JAVA_HOME}/lib/jhdf5.jar" /> -->
     <!-- <pathelement location="${env.HADOOP_HOME}/${env.HADOOP_JAR}"/>  -->
     <!-- <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-${env.HADOOP_VERSION}.jar"/> -->
-    <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-1.1.2.jar"/> 
-    <pathelement location="lib/commons-logging-1.1.1.jar"/> 
+    <!-- <pathelement location="${env.HADOOP_HOME}/contrib/streaming/hadoop-streaming-1.1.2.jar"/> -->
     <!--<pathelement location="${env.HADOOP_HOME}/${env.HADOOP_JAR}"/>-->
-    <pathelement location="${env.NETCDF_HOME}/target/${env.NETCDF_JAR}" />
-    <pathelement location="${env.HDF5_JAVA_HOME}/lib/${env.HDF5_JAVA_JAR}" />
-    <pathelement location="/usr/share/java/hadoop-cephfs.jar" />
-    <pathelement location="/usr/share/java/ant-contrib.jar"/>  
+    <!-- <pathelement location="${env.HDF5_JAVA_HOME}/lib/${env.HDF5_JAVA_JAR}" /> -->
+    <!-- <pathelement location="/usr/share/java/hadoop-cephfs.jar" /> -->
     <!--
     <pathelement location="/home/buck/svn/early_results/lib/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
     -->
-
   </path>
 
   <target name="generate-main" depends="init,write-properties-file">

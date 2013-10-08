@@ -14,7 +14,7 @@ import org.apache.hadoop.io.Text;
  * the data required to open a file and read a contigous 
  * array shape from a variable in said file.
  */
-public class HadoopArraySpec implements WritableComparable {
+public class HadoopArraySpec implements WritableComparable<HadoopArraySpec> {
   private int[] _corner = null;  // anchor point
   private int[] _shape = null;
   private String _varName = null;
@@ -224,9 +224,8 @@ public class HadoopArraySpec implements WritableComparable {
    * zero depending on whether the object passed in is less than,
    * equal to or greater than this object, respectively
    */
-  public int compareTo(Object o) {
+  public int compareTo(HadoopArraySpec other) {
     int retVal = 0;
-    HadoopArraySpec other = (HadoopArraySpec)o;
 
     if ( 0 != this._fileName.compareTo(other.getFileName())){
       return this._fileName.compareTo(other.getFileName());
