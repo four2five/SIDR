@@ -5,7 +5,7 @@ $HADOOP_HOME/bin/hadoop dfs -rmr /user/buck/netcdf_output
 # $HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/hadoop-scidata-v2.jar netcdf_hdfs_filter -D damasc.extraction_shape=1,4276737 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=vals_nod_var1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.fs_type=hdfs -D damasc.coordinate_variable_name=coordx /user/ceph-admin/paul_input/file1.nc /user/ceph-admin/foo 
 
 # need to fix the extraction shape iterator for exShape 1,1,1,1
-$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=3 -D damasc.variable_name=windspeed -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input/file1.nc /user/buck/netcdf_output
+$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input/file1.nc /user/buck/netcdf_output
 
 
 # this sorta works
