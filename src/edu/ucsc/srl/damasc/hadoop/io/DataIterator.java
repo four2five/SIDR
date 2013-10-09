@@ -119,10 +119,10 @@ public class DataIterator{
   }
 
   private void resetReadCounters() { 
-    //this._currentRead = this._presentGroup.clone();
-    this._currentRead = this._presentGroup;
-    //this._currentReadShape = this._rowShape.clone();
-    this._currentReadShape = this._rowShape;
+    this._currentRead = this._presentGroup.clone();
+    this._currentReadShape = this._rowShape.clone();
+    //this._currentRead = this._presentGroup;
+    //this._currentReadShape = this._rowShape;
 
     // this is in terms of bytes, so multiply by dataTypeSize
 
@@ -260,10 +260,8 @@ public class DataIterator{
   }
 
   public int[] getCurrentReadCoordinate() { 
-    //this._retArray = this._currentRead.clone();
-    this._retArray = this._currentRead;
+    this._retArray = this._currentRead.clone();
     this._retArray[this._nDims-1] += this._rowCounter;
-    //return this._retArray.clone();
     return this._retArray;
   }
 
@@ -285,10 +283,10 @@ public class DataIterator{
 
   public int[] getNextGroup() throws IOException { 
     // set the return array aside
-    //this._presentGroup = this._nextGroup.clone();
-    this._presentGroup = this._nextGroup;
-    //this._presentGroupShape = this._nextGroupShape.clone();
-    this._presentGroupShape = this._nextGroupShape;
+    this._presentGroup = this._nextGroup.clone();
+    this._presentGroupShape = this._nextGroupShape.clone();
+    //this._presentGroup = this._nextGroup;
+    //this._presentGroupShape = this._nextGroupShape;
     this._presentGroupOffset = Utils.flatten( this._bufferLogicalShape, this._presentGroup);
 
     /*
