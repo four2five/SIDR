@@ -111,31 +111,9 @@ private static final Log LOG = LogFactory.getLog(MedianMapper.class);
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
         //LOG.info("Key: " + groupID  + " keyCount " + perGroupCount);
         context.write(arraySpec, result, perGroupCount);
-
-        //System.out.println("Just wrote " + perGroupCount + " for map task " + 
-        //                  " with key2: " +
-        //                  arraySpec.toString()); 
       }
 
-      /*
-      long totalElements = Utils.calcTotalSize( key.getShape() );
-      for( int i=0; i<totalElements; i++) { 
-        //System.out.println(i + ":" + Array.getLong(hiddenArray, i));
-        longW.set(Array.getLong(hiddenArray,i));
-        context.write(groupID, longW);
-      }
-      */
-
-      
       timer = System.currentTimeMillis() - timer;
-
-      /*
-      System.out.println("Just wrote " + totalElements + " for map task " + 
-                         task.getId() + " with key2: " +
-                         arraySpec.toString() + 
-                         " and it took " + timer + " ms"); 
-      */
-      //context.write(groupID, intW);
     } catch ( Exception e ) {
       System.out.println("Caught an exception in MedianMapper.map()" + e.toString() );
       e.printStackTrace();
