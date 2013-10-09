@@ -1,5 +1,6 @@
 package edu.ucsc.srl.tools;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayObject;
 import ucar.ma2.ArrayInt;
-import ucar.ma2.ArrayLong;
+import ucar.ma2.ArrayShort;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.Index;
 import ucar.ma2.IteratorFast;
@@ -71,15 +72,15 @@ public class NetcdfFileGenerator {
             }
 
             ncFile.write(variable.getVariableName(),array);
-        } else if ( variable.getType() == DataType.LONG)  {
-            array = new ArrayLong(dimensions);
-            long tempLong = 0;
+        } else if ( variable.getType() == DataType.SHORT)  {
+            array = new ArrayShort(dimensions);
+            short tempShort = 0;
             IndexIterator iter = array.getIndexIterator();
 
             while (iter.hasNext() ) {
-                iter.getLongNext();
-                iter.setLongCurrent(tempLong);
-                tempLong++;
+                iter.getShortNext();
+                iter.setShortCurrent(tempShort);
+                tempShort++;
             }
 
             ncFile.write(variable.getVariableName(),array);
@@ -90,7 +91,7 @@ public class NetcdfFileGenerator {
     }
 
     private NetcdfFileWriteable writeNetcdfMetadata( NetcdfFileWriteable ncFile,
-                                                     String variableName,
+                                                     String variableName, DataType dt,
                                                      ArrayList<ArrayList<VariableEntry>> variableListList )
         throws IOException {
 
@@ -134,7 +135,13 @@ public class NetcdfFileGenerator {
 
             // add the main variable
             System.out.println("adding variable " + (variableName + Integer.toString(suffixInt) ) );
-            ncFile.addVariable(variableName + Integer.toString(suffixInt), DataType.INT, dims);
+            if (dt == DataType.INT ) {
+              ncFile.addVariable(variableName + Integer.toString(suffixInt), DataType.INT, dims);
+            } else if (dt == DataType.FLOAT )  {
+              ncFile.addVariable(variableName + Integer.toString(suffixInt), DataType.FLOAT, dims);
+            } else if (dt == DataType.SHORT)  {
+              ncFile.addVariable(variableName + Integer.toString(suffixInt), DataType.SHORT, dims);
+            }
             suffixInt++;
         }
 /*
@@ -215,8 +222,10 @@ public class NetcdfFileGenerator {
         int[] singleStep = createWriteStep(dimensions, singleWriteSize, highestNonWriteDim);
         int numStepWrites = determineNumberOfStepWrites( singleStep, singleWriteSize);
 
-        System.out.println("SingleWriteSize: " + singleWriteSize + " datatype size: " + dataType.getSize() + 
-                           " singleStep: " + arrayToString(singleStep) + " numberStepsPerWrite: " + numStepWrites);
+        System.out.println("SingleWriteSize: " + singleWriteSize + 
+                           " datatype size: " + dataType.getSize() + 
+                           " singleStep: " + Arrays.toString(singleStep) + 
+                           " numberStepsPerWrite: " + numStepWrites);
 
         int[] allOnes = new int[dimensions.length];
         int[] allZeros = new int[dimensions.length];
@@ -232,6 +241,7 @@ public class NetcdfFileGenerator {
         long writtenSoFar = 0;
 
         boolean done = false;
+        Array array = null;
 
         while ( !done ) {
             for ( int i=0; i < numStepWrites; i++) {
@@ -241,18 +251,19 @@ public class NetcdfFileGenerator {
                      ((origin.getCurrentCounter()[highestNonWriteDim] + numStepWrites) <= dimensions[highestNonWriteDim])  
                    ) {
                     singleStep[highestNonWriteDim] = numStepWrites;
-                    System.out.println("JUST OPTIMIZED. New write step: " + arrayToString(singleStep) );
+                    System.out.println("JUST OPTIMIZED. New write step: " + Arrays.toString(singleStep) );
                     // keep 'i' right
                     i += numStepWrites - 1;
                 } else {
                     singleStep[highestNonWriteDim] = 1;
                 }
 
+                // -jbuck
+                if (DataType.INT == dataType) {
+                  array = new ArrayInt( singleStep );
+                  IndexIterator iter = array.getIndexIterator();
 
-                Array array = new ArrayInt( singleStep );
-                IndexIterator iter = array.getIndexIterator();
-
-                while( iter.hasNext() ) {
+                  while( iter.hasNext() ) {
                     iter.getIntNext();
                     // uncomment the following line for a random distribution
                     //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
@@ -260,15 +271,50 @@ public class NetcdfFileGenerator {
                     iter.setIntCurrent(valueCounter);
                     valueCounter++;
 
-                  // book keeping
+                    // book keeping
                     writtenSoFar++;
                     //origin.incr();
+                  }
+                } else if (DataType.FLOAT == dataType) {
+                  array = new ArrayFloat( singleStep );
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                    iter.getFloatNext();
+                    // uncomment the following line for a random distribution
+                    //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                    // uncomment this line for an incrementing value
+                    iter.setFloatCurrent(valueCounter);
+                    valueCounter++;
+
+                    // book keeping
+                    writtenSoFar++;
+                    //origin.incr();
+                  }
+                } else if (DataType.SHORT == dataType) {
+                  array = new ArrayShort(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                    iter.getShortNext();
+                    // uncomment the following line for a random distribution
+                    //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                    // uncomment this line for an incrementing value
+                    iter.setShortCurrent((short)valueCounter);
+                    valueCounter++;
+
+                    // book keeping
+                    writtenSoFar++;
+                    //origin.incr();
+                  }
                 }
 
-                System.out.println("Writing to file: " + ncFile.getLocation() + ". var_name: " + varName  + 
-                                   " origin: " + arrayToString(origin.getCurrentCounter()) + 
+
+                System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                   ". var_name: " + varName  + 
+                                   " origin: " + Arrays.toString(origin.getCurrentCounter()) + 
                                    " writeSize: " + array.getSize() + 
-                                   " write shape: " + arrayToString(singleStep) );
+                                   " write shape: " + Arrays.toString(singleStep) );
 
                 // write to the actual file
                 ncFile.write(varName, origin.getCurrentCounter(), array);
@@ -280,9 +326,9 @@ public class NetcdfFileGenerator {
                     origin.incr();
                 }
                 
-                
-                System.out.println("\tcurrentIndex: " + arrayToString(origin.getCurrentCounter()) + 
-                                   " currentElement: " + origin.currentElement() + " totalsize: " + (totalSize) + 
+                System.out.println("\tcurrentIndex: " + Arrays.toString(origin.getCurrentCounter()) + 
+                                   " currentElement: " + origin.currentElement() + 
+                                   " totalsize: " + (totalSize) + 
                                    " writtenSoFar: " + writtenSoFar );
                 
                 if ( writtenSoFar  >= totalSize ) {
@@ -328,7 +374,7 @@ public class NetcdfFileGenerator {
             // this loop needs to define all the meta-data prior to any data being written
             // set the metadata 
             System.out.println("\t calling writeNetcdfMetadata for file " + ncfile.getLocation() );
-            ncfile = this.writeNetcdfMetadata(ncfile, variableName, variableListList);
+            ncfile = this.writeNetcdfMetadata(ncfile, variableName, dataType, variableListList);
 
             // this is only called once per file
             ncfile.create();
@@ -363,33 +409,22 @@ public class NetcdfFileGenerator {
         return valueCounter;
     }
 
-    private String arrayToString( int[] array ) {
-        String tempStr = "";
-
-        for (int i=0; i<array.length; i++) {
-            if (i>0)
-                tempStr += ",";
-            tempStr += array[i];
-        }
-
-        return tempStr;
-    }
-
     // This is where the dimensions and shape of the file are configured
     public static void main(String args[]) {
 
         // list out the dimensions for this file
 
-        String variableName = "windspeed"; // this is for the measurement actually in this data set
-        DataType dataType = DataType.INT; // data type for the actual data
+        String variableName1 = "windspeed"; // this is for the measurement actually in this data set
+        String variableName2 = "waterspeed"; // this is for the measurement actually in this data set
+        DataType dataType1 = DataType.INT; // data type for the actual data
+        DataType dataType2 = DataType.SHORT; // data type for the actual data
 
         NetcdfFileGenerator myGen = new NetcdfFileGenerator(); 
-        int numFiles = 1;
         int writeSeed = 0;
 
-        for ( int i = 0; i < numFiles; i++) { 
-          writeSeed = myGen.createFile(variableName, dataType, writeSeed);
-        }
+        writeSeed = myGen.createFile(variableName1, dataType1, writeSeed);
+        writeSeed = 0;
+        writeSeed = myGen.createFile(variableName2, dataType2, writeSeed);
 
     }
     
