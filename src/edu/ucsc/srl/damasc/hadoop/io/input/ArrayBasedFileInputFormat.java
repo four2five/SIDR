@@ -551,7 +551,7 @@ public abstract class ArrayBasedFileInputFormat
       if (tempSpec == null) { 
         System.out.println("Reducer:[" + counter + "]:" + " has null specs");
       } else { 
-        System.out.println("Reducer:[" + counter + "]:" + itr.next().toString());
+        System.out.println("Reducer:[" + counter + "]:" + tempSpec.toString());
       }
       counter++;
     }
