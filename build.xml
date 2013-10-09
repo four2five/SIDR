@@ -11,6 +11,7 @@
 <project name="SIDR" default="main">
   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
+	<property name="properties.filename" value="file_formats.properties" />
   <property name="src.dir" value="src"/>
   <property name="doc.dir" value="docs"/>
   <property name="lib.dir" value="lib"/>
@@ -240,6 +241,7 @@
     <delete dir="${build.dir}"/>
     <delete dir="${doc.dir}"/>
     <delete file="${src.dir}/${generated.file}"/>
+    <delete file="${properties.filename}"/>
   </target>
 
   <target name="main" depends="clean,jar,run"/>
@@ -256,12 +258,12 @@
 	    <if>
 	      <isset property="build.netcdf"/>
 	      <then>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="netcdf" type="string" value="true" />
           </propertyfile>
 	      </then>
 	      <else>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="netcdf" type="string" value="false" />
           </propertyfile>
 	      </else>
@@ -269,12 +271,12 @@
 	    <if>
 	      <isset property="build.netcdf_hdfs"/>
 	      <then>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="netcdf_hdfs" type="string" value="true" />
           </propertyfile>
 	      </then>
 	      <else>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="netcdf_hdfs" type="string" value="false" />
           </propertyfile>
 	      </else>
@@ -282,12 +284,12 @@
 	    <if>
 	      <isset property="build.hdf5"/>
 	      <then>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="hdf5" type="string" value="true" />
           </propertyfile>
 	      </then>
 	      <else>
-          <propertyfile file="file_formats.properties" comment="File Formats to Build">
+          <propertyfile file="${properties.filename}" comment="File Formats to Build">
             <entry key="hdf5" type="string" value="false" />
           </propertyfile>
 	      </else>
