@@ -69,6 +69,7 @@ public class Median2 extends Configured implements Tool {
     DataType inputDataType = NetCDFHDFSTools.getDataType(inputPath.toString(),
                                                         variableName, conf);
     System.out.println("Input size: " + inputDataType.getSize());
+    Utils.setDatatypeSize(conf, inputDataType.getSize());
 
     // get the ceph conf file path
     String cephConfPath = Utils.getCephConfPath(conf);

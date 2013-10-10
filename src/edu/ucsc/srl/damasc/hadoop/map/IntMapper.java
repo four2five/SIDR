@@ -23,16 +23,14 @@ import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
  */
 public class IntMapper extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResult> {
 
-  private static int DATATYPESIZE = 4;
-  @SuppressWarnings("unused")
-private static final Log LOG = LogFactory.getLog(IntMapper.class);
+  private static final Log LOG = LogFactory.getLog(IntMapper.class);
 
- /**
- * Reduces values for a given key
- * @param key ArraySpec representing the given Array being passed in
- * @param value an Array to process that corresponds to the given key 
- * @param context the Context object for the currently executing job
- */
+  /**
+   * Splits values into given extraction shapes
+   * @param key ArraySpec representing the given Array being passed in
+   * @param value an Array to process that corresponds to the given key 
+   * @param context the Context object for the currently executing job
+   */
   public void map(ArraySpec key, MultiVarData inMVD, Context context)
                   throws IOException, InterruptedException {
 
@@ -44,10 +42,11 @@ private static final Log LOG = LogFactory.getLog(IntMapper.class);
       long timer = System.currentTimeMillis();
      
       long elementCount = Utils.calcTotalSize(key.getShape());
-      System.out.println("Array Spec has " + elementCount + " elements");
+      LOG.info("Array Spec has " + elementCount + " elements");
 
       int[] extractionShape = Utils.getExtractionShape(context.getConfiguration(),
                                                         key.getShape().length);
+      int extShapeSize = Utils.calcTotalSize(extractionShape);
 
       int[] allOnes = new int[extractionShape.length];
       for( int i=0; i<allOnes.length; i++){
@@ -55,28 +54,25 @@ private static final Log LOG = LogFactory.getLog(IntMapper.class);
       }
 
       ArraySpec arraySpec = new ArraySpec(key.getCorner(), "");
-      //System.out.println("Creating a HolisticResult2 with capacity: " + 
-        //Utils.calcTotalSize(extractionShape));
-      int extShapeSize = Utils.calcTotalSize(extractionShape);
       HolisticResult result = new HolisticResult(extShapeSize);
 
-      System.out.println("in mapper, corner is: " + 
-                         Utils.arrayToString(key.getCorner()) + 
-                         " shape: " + Utils.arrayToString(key.getShape())
-                         + " extsize: " + extShapeSize + 
-                         " extShape: " + Arrays.toString(extractionShape));
+      LOG.info("in mapper, corner is: " +  Utils.arrayToString(key.getCorner()) + 
+               " shape: " + Utils.arrayToString(key.getShape()) + 
+               " extsize: " + extShapeSize + 
+               " extShape: " + Arrays.toString(extractionShape));
      
       Configuration conf = context.getConfiguration();
       String varName = Utils.getVariableName(conf);
       ByteBuffer inArray = inMVD.getVarDataByName(varName);
+      int datatypeSize = Utils.getDatatypeSize(conf);
 
       DataIterator dataItr = new DataIterator(inArray, key.getCorner(),
                                                   key.getShape(), extractionShape,
-                                                  DATATYPESIZE);
+                                                  datatypeSize);
       int[] tempGroup;
       int[] tempArray = new int[extractionShape.length];
       long totalElements = 0;
-      int medianValue = 0;
+      //int medianValue = 0;
       int perGroupCount = 0;
 
       while( dataItr.hasMoreGroups() ) { 
@@ -85,19 +81,20 @@ private static final Log LOG = LogFactory.getLog(IntMapper.class);
         result.setNeededCount(extShapeSize);
         perGroupCount = 0;
 
-
         while( dataItr.groupHasMoreValues() ) { 
           result.setValue(dataItr.getNextValueInt());
           totalElements++;
           perGroupCount++;
         }
 
+        /* --jbuck here
         if( result.isFull() ) {
           result.sort();
           medianValue = result.getValue(result.getCurrentCount()/2);
           result.setFinal(medianValue);
         } else {
         }
+        */
 
         arraySpec.setVariable(key.getVarName());
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
