@@ -21,11 +21,11 @@ import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
  * This mapper will separate values in the input into their respective 
  * extraction shape instances
  */
-public class IntMapper extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResult> {
+public class ShortMapper extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResult> {
 
   private static int DATATYPESIZE = 4;
   @SuppressWarnings("unused")
-private static final Log LOG = LogFactory.getLog(IntMapper.class);
+private static final Log LOG = LogFactory.getLog(ShortMapper.class);
 
  /**
  * Reduces values for a given key
@@ -107,7 +107,7 @@ private static final Log LOG = LogFactory.getLog(IntMapper.class);
 
       timer = System.currentTimeMillis() - timer;
     } catch ( Exception e ) {
-      System.out.println("Caught an exception in IntMapper.map()" + e.toString() );
+      System.out.println("Caught an exception in ShortMapper.map()" + e.toString() );
       e.printStackTrace();
     }
   }

@@ -28,10 +28,11 @@ import edu.ucsc.srl.damasc.hadoop.io.NcHdfsRaf;
 import edu.ucsc.srl.damasc.hadoop.Utils.FSType;
 import edu.ucsc.srl.damasc.hadoop.Utils;
 
+import ucar.ma2.Array;
+import ucar.ma2.DataType;
+import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-import ucar.nc2.Dimension;
-import ucar.ma2.Array;
 import ucar.ma2.IndexIterator;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -124,31 +125,38 @@ public class NetCDFHDFSTools{
 
   public static int[] getVariableShape( String inputFilePath, 
                                         String variableName, Configuration conf) { 
+	  int[] dims = null;
+
+    Variable ourVar = null;
+    ourVar = getVariable(inputFilePath, variableName, conf);
+     
+	  // if this is true, our variable is not in this file. Bail.
+	  if( null == ourVar ) {
+	  } else { 
+	    List<Dimension> readDims = ourVar.getDimensions();
+      dims = new int[readDims.size()];
+      for( int i=0; i<dims.length; i++) { 
+        dims[i] = readDims.get(i).getLength();
+      }
+	  }
+    System.out.println("dims: " + Utils.arrayToString(dims));
+    return dims;
+  }
+
+  public static Variable getVariable( String inputFilePath, 
+                                      String variableName, Configuration conf) { 
    
-	  int[] dims = {};
 	  NetcdfFile file = null; 
     RandomAccessFile raf = null;
-    //CephFileSystem cfs = null;
 
+	  Variable ourVar = null;
     try { 
-	    //CephFileSystem cfs = new CephFileSystem();
-	    //cfs.initialize(URI.create("ceph://null"), conf);
-	    //int bufferSize = Utils.getBufferSize(conf);
+      System.out.println(" getVariable, path: " + inputFilePath);
 
-      //String fileToRead = Utils.stripURIInfo(inputFilePath, conf.get("fs.default.name", ""));
-      //System.out.println(" getVariableShape, path: " + "ceph://null" + fileToRead);
-      System.out.println(" getVariableShape, path: " + inputFilePath);
-
-      /*
-	    NcCephRaf raf = new NcCephRaf( 
-	                          cfs.getFileStatus(
-	                            new Path( URI.create("ceph://null" + inputFilePath))), 
-	                            conf, bufferSize);
-      */
       raf = getRAF( conf, inputFilePath);
       if( null == raf) { 
         System.out.println("In getVariableShape . raf is NULL");
-        return new int[0];
+        return null;
       }
 
 	    file = NetcdfFile.open(raf, inputFilePath); 
@@ -156,7 +164,6 @@ public class NetCDFHDFSTools{
 	    List<Variable> vars = file.getVariables();
 	    Iterator<Variable> iter = vars.listIterator();
 	
-	    Variable ourVar = null;
 	
 	    while( iter.hasNext() ) { 
 	      ourVar = iter.next();
@@ -169,27 +176,15 @@ public class NetCDFHDFSTools{
 	        ourVar = null;
 	      }
 	    }
-	
-	
-	    // if this is true, our variable is not in this file. Bail.
-	    if( null == ourVar ) {
-	    } else { 
-	      List<Dimension> readDims = ourVar.getDimensions();
-        dims = new int[readDims.size()];
-        for( int i=0; i<dims.length; i++) { 
-          dims[i] = readDims.get(i).getLength();
-        }
-	    }
     } catch ( IOException ioe ) { 
       ioe.printStackTrace();
+      ourVar = null;
     } finally { 
       if( null != file) { 
         try{ 
           file.close();
           if( null != raf)
             raf.close();
-          //if(null != cfs)
-           // cfs.close();
         } catch( IOException ioe) { 
           System.out.println("Caught while closing file: " + inputFilePath);
           ioe.printStackTrace();
@@ -197,86 +192,27 @@ public class NetCDFHDFSTools{
       }
     }
 
-    System.out.println("dims: " + Utils.arrayToString(dims));
-    return dims;
+    return ourVar;
   }
 
-  public static int getDataTypeSize(String cephConfFile, String inputFilePath,
+  public static int getDataTypeSize(String inputFilePath,
                                     String variableName, Configuration conf) {
+    return getDataType(inputFilePath, variableName, conf).getSize();
+  }
 
-    return 4;
-    /*
-    int dataTypeSize = -1;
-
-    return 4;
-    /*
+  public static DataType getDataType(String inputFilePath,
+                                String variableName, Configuration conf) {
+    DataType dataType = null;
 	  NetcdfFile file = null; 
 
-    NcCephRaf raf = null;
-    CephFileSystem cfs = null;
+    Variable ourVar = getVariable(inputFilePath, variableName, conf);
+    // if the variable is not found, we should return the default of -1
+	  if( null != ourVar ) {
+      dataType = ourVar.getDataType();
+	  }
+    System.out.println("data type: " + dataType.toString());
 
-    try { 
-
-	    cfs = new CephFileSystem();
-	    cfs.initialize(URI.create("ceph://null/"), conf);
-	    int bufferSize = Utils.getBufferSize(conf);
-
-      //String fileToRead = Utils.stripURIInfo(inputFilePath, conf.get("fs.default.name", ""));
-      //System.out.println(" getVariableShape, path: " + "ceph://null" + fileToRead);
-      System.out.println(" getDataTypeSize, path: " + "ceph://null" + inputFilePath);
-      System.out.println("buffersize: " + bufferSize);
-
-	    raf = new NcCephRaf( 
-	                          cfs.getFileStatus(
-	                            new Path( URI.create("ceph://null/" + inputFilePath))), 
-	                            conf, bufferSize);
-	    file = NetcdfFile.open(raf, inputFilePath); 
-	
-	    List<Variable> vars = file.getVariables();
-	    Iterator iter = vars.listIterator();
-	
-	    Variable ourVar = null;
-	
-	    while( iter.hasNext() ) { 
-	      ourVar = (Variable)iter.next();
-	      System.out.println("Comparing " + ourVar.getName() + " to " + 
-	                         variableName);
-	      if( ourVar.getName().compareTo(variableName) == 0) { 
-	        System.out.println("Found the matching variable");
-	        break;
-	      } else {
-	        ourVar = null;
-	      }
-	    }
-	
-	
-	    // if this is true, our variable is not in this file. Bail.
-	    if( null == ourVar ) {
-	    } else { 
-	      //List<Dimension> readDims = ourVar.getDimensions();
-        dataTypeSize = ourVar.getDataType().getSize();
-	    }
-    } catch ( IOException ioe ) { 
-      ioe.printStackTrace();
-    } finally { 
-      if( null != file) { 
-        try{ 
-          file.close();
-          if( raf != null)
-            raf.close();
-          if( cfs != null)
-            cfs.close();
-
-        } catch( IOException ioe) { 
-          System.out.println("Caught while closing file: " + inputFilePath);
-          ioe.printStackTrace();
-        }
-      }
-    }
-
-    System.out.println("data type size: " + dataTypeSize);
-    return dataTypeSize;
-  */
+    return dataType;
   }
 
   public static RandomAccessFile getRAF( Configuration conf, FileStatus fstat ) 

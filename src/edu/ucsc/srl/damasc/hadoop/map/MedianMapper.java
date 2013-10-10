@@ -16,18 +16,10 @@ import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.DataIterator;
 import edu.ucsc.srl.damasc.hadoop.io.HolisticResult;
 import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
-//import java.lang.Thread;
-//import org.apache.hadoop.io.IntWritable;
-//import edu.ucsc.srl.damasc.hadoop.io.HolisticResult2;
-
-/*
-import ucar.ma2.Array;
-import ucar.ma2.ArrayInt;
-*/
 
 /**
- * Dummy mapper, just passed data through with a dummy key.
- * This is used for testing purposes
+ * This mapper will separate values in the input into their respective 
+ * extraction shape instances
  */
 public class MedianMapper extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResult> {
 
