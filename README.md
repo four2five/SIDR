@@ -5,8 +5,10 @@ This code was used for the experimental portion of the SC '13 paper: http://sc13
 
 We're working on a more feature complete version of this code that should be posted shortly (Oct 2013).
 
-Installation
+Installation 
 ====
+These instructions worked on Ubuntu 12.04. YMMV.
+
 I tend to put the export commands into my .bashrc file so that they're persistent.
 
 1. `sudo apt-get install ant-contrib build-essential git maven python-software-properties autoconf libtool`
