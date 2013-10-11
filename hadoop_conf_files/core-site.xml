@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+<property>
+    <name>fs.default.name</name>
+    <value>hdfs://localhost:9000</value>
+  </property>
+  <property>
+    <name>dfs.block.size</name>
+    <value>134217728</value>
+    <description>Using 128 MB as  the blocksize</description>
+  </property>
+</configuration>

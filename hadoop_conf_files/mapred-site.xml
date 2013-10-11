@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+  <property>
+    <name>mapred.job.tracker</name>
+    <value>localhost:54311</value>
+    <description>The host and port that the MapReduce job tracker runs
+    at.  If "local", then jobs are run in-process as a single map
+    and reduce task.
+    </description>
+  </property>
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value>3</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <!-- <value>3</value> -->
+    <value>2</value>
+  </property>
+  <property>
+    <name>mapred.map.child.java.opts</name>
+    <value>-Xms512m -Xmx768m</value>
+  </property>
+  <property>
+    <name>mapred.reduce.child.java.opts</name>
+    <value>-Xms1024m -Xmx1408m</value>
+    <!-- <value>-Xms1024m -Xmx1280m</value> -->
+  </property>
+  <property>
+    <name>mapred.job.reuse.jvm.num.tasks</name>
+    <value>-1</value>
+  </property>
+  <property>
+    <name>mapred.dependency_scheduling</name>
+    <!-- <value>true</value> -->
+    <value>true</value>
+  </property>
+  <property>
+    <name>mapred.reduce.parallel.copies</name>
+    <value>10</value>
+  </property>
+</configuration>
