@@ -11,6 +11,8 @@ These instructions worked on Ubuntu 12.04. YMMV.
 
 I tend to put the export commands into my .bashrc file so that they're persistent.
 
+The hadoop_conf_files directory contains the configuration files I use to run SIDR on a single-node setup. 
+
 1. `sudo apt-get install ant-contrib build-essential git maven python-software-properties autoconf libtool`
     * export CLASSPATH=$CLASSPATH:/usr/share/java/ant-contrib.jar
 2. install java 7 (we use oracle’s, you can try openjdk if you want)
