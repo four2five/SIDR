@@ -45,6 +45,7 @@ I tend to put the export commands into my .bashrc file so that they're persisten
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
    `cd SIDR`     
+   `git checkout sc13_experiments`    
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    
