@@ -12,9 +12,10 @@ import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayObject;
+import ucar.ma2.ArrayFloat;
 import ucar.ma2.ArrayInt;
 import ucar.ma2.ArrayLong;
-import ucar.ma2.ArrayFloat;
+import ucar.ma2.ArrayShort;
 import ucar.ma2.Index;
 import ucar.ma2.IteratorFast;
 import ucar.ma2.DataType; 
@@ -91,6 +92,7 @@ public class NetcdfFileGenerator {
 
     private NetcdfFileWriteable writeNetcdfMetadata( NetcdfFileWriteable ncFile,
                                                      String variableName,
+                                                     DataType dataType,
                                                      ArrayList<ArrayList<VariableEntry>> variableListList )
         throws IOException {
 
@@ -133,8 +135,8 @@ public class NetcdfFileGenerator {
             }
 
             // add the main variable
-            System.out.println("adding variable " + (variableName + Integer.toString(suffixInt) ) );
-            ncFile.addVariable(variableName + Integer.toString(suffixInt), DataType.INT, dims);
+            System.out.println("adding variable " + (variableName));
+            ncFile.addVariable(variableName, dataType, dims);
             suffixInt++;
         }
 /*
@@ -232,6 +234,7 @@ public class NetcdfFileGenerator {
         long writtenSoFar = 0;
 
         boolean done = false;
+        Array array = null;
 
         while ( !done ) {
             for ( int i=0; i < numStepWrites; i++) {
@@ -248,27 +251,51 @@ public class NetcdfFileGenerator {
                     singleStep[highestNonWriteDim] = 1;
                 }
 
+                if (DataType.INT == dataType) { 
+                  array = new ArrayInt(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
 
-                Array array = new ArrayInt( singleStep );
-                IndexIterator iter = array.getIndexIterator();
+                  while( iter.hasNext() ) {
+                      iter.getIntNext();
+                      // uncomment the following line for a random distribution
+                      //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                      // uncomment this line for an incrementing value
+                      iter.setIntCurrent(valueCounter);
+                      valueCounter++;
 
-                while( iter.hasNext() ) {
-                    iter.getIntNext();
-                    // uncomment the following line for a random distribution
-                    //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
-                    // uncomment this line for an incrementing value
-                    iter.setIntCurrent(valueCounter);
-                    valueCounter++;
+                      // book keeping
+                      writtenSoFar++;
+                      //origin.incr();
+                  }
 
-                  // book keeping
-                    writtenSoFar++;
-                    //origin.incr();
+                  System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                     ". var_name: " + varName  + 
+                                     " origin: " + arrayToString(origin.getCurrentCounter()) + 
+                                     " writeSize: " + array.getSize() + 
+                                     " write shape: " + arrayToString(singleStep) );
+                } else if (DataType.SHORT == dataType) { 
+                  array = new ArrayShort(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                      iter.getShortNext();
+                      // uncomment the following line for a random distribution
+                      //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                      // uncomment this line for an incrementing value
+                      iter.setShortCurrent((short)valueCounter);
+                      valueCounter++;
+
+                      // book keeping
+                      writtenSoFar++;
+                      //origin.incr();
+                  }
+
+                  System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                     ". var_name: " + varName  + 
+                                     " origin: " + arrayToString(origin.getCurrentCounter()) + 
+                                     " writeSize: " + array.getSize() + 
+                                     " write shape: " + arrayToString(singleStep) );
                 }
-
-                System.out.println("Writing to file: " + ncFile.getLocation() + ". var_name: " + varName  + 
-                                   " origin: " + arrayToString(origin.getCurrentCounter()) + 
-                                   " writeSize: " + array.getSize() + 
-                                   " write shape: " + arrayToString(singleStep) );
 
                 // write to the actual file
                 ncFile.write(varName, origin.getCurrentCounter(), array);
@@ -282,7 +309,8 @@ public class NetcdfFileGenerator {
                 
                 
                 System.out.println("\tcurrentIndex: " + arrayToString(origin.getCurrentCounter()) + 
-                                   " currentElement: " + origin.currentElement() + " totalsize: " + (totalSize) + 
+                                   " currentElement: " + origin.currentElement() + 
+                                   " totalsize: " + (totalSize) + 
                                    " writtenSoFar: " + writtenSoFar );
                 
                 if ( writtenSoFar  >= totalSize ) {
@@ -301,7 +329,8 @@ public class NetcdfFileGenerator {
         // hacky init
         this._unlimitedDim = null;
 
-        ArrayList<ArrayList<VariableEntry>> variableListList = new ArrayList<ArrayList<VariableEntry>>();
+        ArrayList<ArrayList<VariableEntry>> variableListList = 
+          new ArrayList<ArrayList<VariableEntry>>();
 
         // seperate method to define the variables for this file
         /*
@@ -319,7 +348,7 @@ public class NetcdfFileGenerator {
         Random generator = new Random( now.getTime() );
         int valueCounter = writeSeed;
 
-        String filename = Long.toString(now.getTime()) + ".nc";
+        String filename = Long.toString(now.getTime()) + "." + dataType.toString() + ".nc";
 
         try { 
             // create the file
@@ -328,7 +357,7 @@ public class NetcdfFileGenerator {
             // this loop needs to define all the meta-data prior to any data being written
             // set the metadata 
             System.out.println("\t calling writeNetcdfMetadata for file " + ncfile.getLocation() );
-            ncfile = this.writeNetcdfMetadata(ncfile, variableName, variableListList);
+            ncfile = this.writeNetcdfMetadata(ncfile, variableName, dataType, variableListList);
 
             // this is only called once per file
             ncfile.create();
@@ -346,7 +375,7 @@ public class NetcdfFileGenerator {
                 }
 
                 // write data to the file
-                valueCounter = this.populateFile2(ncfile, variableName + Integer.toString(suffixInt), 
+                valueCounter = this.populateFile2(ncfile, variableName, 
                                                   dataType, dimensions, valueCounter, generator); 
                                                   
                 suffixInt++;
@@ -380,29 +409,32 @@ public class NetcdfFileGenerator {
 
         // list out the dimensions for this file
 
-        String variableName = "windspeed"; // this is for the measurement actually in this data set
-        DataType dataType = DataType.INT; // data type for the actual data
+        String variableName1 = "windspeed1"; // this is for the measurement actually in this data set
+        String variableName2 = "windspeed2"; // this is for the measurement actually in this data set
+        DataType dataType1 = DataType.INT; // data type for the actual data
+        DataType dataType2 = DataType.SHORT; // data type for the actual data
 
         NetcdfFileGenerator myGen = new NetcdfFileGenerator(); 
-        int numFiles = 1;
+        //int numFiles = 1;
         int writeSeed = 0;
 
-        for ( int i = 0; i < numFiles; i++) { 
-          writeSeed = myGen.createFile(variableName, dataType, writeSeed);
-        }
+        //for ( int i = 0; i < numFiles; i++) { 
+          writeSeed = myGen.createFile(variableName1, dataType1, writeSeed);
+          writeSeed = myGen.createFile(variableName2, dataType2, writeSeed);
+        //}
 
     }
     
     private ArrayList<VariableEntry> defineDataForThisFile1 () { 
         ArrayList<VariableEntry> variableList = new ArrayList<VariableEntry>();
 
-        variableList.add(new VariableEntry("time", 20, DataType.INT, true, 
+        variableList.add(new VariableEntry("time", 80, DataType.INT, true, 
                          "days", "time since midnight, 1,1,1980") );
-        variableList.add(new VariableEntry("lat1", 720, DataType.FLOAT, false, 
+        variableList.add(new VariableEntry("lat1", 180, DataType.FLOAT, false, 
                          "latitude", "half_degrees_from_north" ) );
-        variableList.add(new VariableEntry("lon1", 720, DataType.FLOAT, false, 
+        variableList.add(new VariableEntry("lon1", 360, DataType.FLOAT, false, 
                          "longitude", "quarter_degrees_going_east" ) );
-        variableList.add(new VariableEntry("elev1", 100, DataType.FLOAT, false, 
+        variableList.add(new VariableEntry("elev1", 50, DataType.FLOAT, false, 
                          "elevation", "meters") );
 
         return variableList;
