@@ -14,14 +14,16 @@ import org.apache.hadoop.mapreduce.TaskID;
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.DataIterator;
-import edu.ucsc.srl.damasc.hadoop.io.HolisticResultInt;
+import edu.ucsc.srl.damasc.hadoop.io.AverageResultShort;
 import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
 
 /**
+ * Dummy mapper, just passed data through with a dummy key.
+ * This is used for testing purposes
  */
-public class MedianMapperInt extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResultInt> {
+public class AverageMapperShort extends Mapper<ArraySpec, MultiVarData, ArraySpec, AverageResultShort> {
 
-private static final Log LOG = LogFactory.getLog(MedianMapperInt.class);
+private static final Log LOG = LogFactory.getLog(AverageMapperShort.class);
 
  /**
  * Reduces values for a given key
@@ -40,7 +42,8 @@ private static final Log LOG = LogFactory.getLog(MedianMapperInt.class);
       long timer = System.currentTimeMillis();
      
       long elementCount = Utils.calcTotalSize(key.getShape());
-      System.out.println("Array Spec has " + elementCount + " elements");
+      System.out.println("Array Spec has corner " + Arrays.toString(key.getCorner()) + 
+                         " and "  + elementCount + " elements");
 
       int[] extractionShape = Utils.getExtractionShape(context.getConfiguration(),
                                                         key.getShape().length);
@@ -52,8 +55,9 @@ private static final Log LOG = LogFactory.getLog(MedianMapperInt.class);
 
       ArraySpec arraySpec = new ArraySpec(key.getCorner(), "");
       int extShapeSize = Utils.calcTotalSize(extractionShape);
-      HolisticResultInt result = new HolisticResultInt(extShapeSize);
+      AverageResultShort aRes = new AverageResultShort();
 
+    
       Configuration conf = context.getConfiguration();
       String varName = Utils.getVariableName(conf);
       ByteBuffer inArray = inMVD.getVarDataByName(varName);
@@ -62,46 +66,54 @@ private static final Log LOG = LogFactory.getLog(MedianMapperInt.class);
       System.out.println("in mapper, corner is: " + 
                          Arrays.toString(key.getCorner()) + 
                          " shape: " + Arrays.toString(key.getShape()) + 
-                         " extsize: " + extShapeSize + 
                          " extShape: " + Arrays.toString(extractionShape) + 
+                         " extSize: " + extShapeSize + 
                          " datatypeSize: " + datatypeSize);
-     
+
+
       DataIterator dataItr = new DataIterator(inArray, key.getCorner(),
                                                   key.getShape(), extractionShape,
                                                   datatypeSize);
       int[] tempGroup;
       int[] tempArray = new int[extractionShape.length];
       long totalElements = 0;
-      int medianValue = 0;
+      long totalGroups = 0;
+      long perGroupTotal = 0;
       int perGroupCount = 0;
 
       while( dataItr.hasMoreGroups() ) { 
         tempGroup = dataItr.getNextGroup();
-        result.clear(); // reset the holistic result
-        result.setNeededCount(extShapeSize);
+        perGroupTotal = 0;
         perGroupCount = 0;
+        
 
 
         while( dataItr.groupHasMoreValues() ) { 
-          result.setValue(dataItr.getNextValueInt());
-          totalElements++;
+          perGroupTotal += dataItr.getNextValueShort();
           perGroupCount++;
+
+          totalElements++;
         }
 
-        if( result.isFull() ) {
-          result.sort();
-          medianValue = result.getValue(result.getCurrentCount()/2);
-          result.setFinal(medianValue);
-        }
+        aRes.setValue((float)perGroupTotal/perGroupCount, perGroupCount);
+        Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
+
+        totalGroups++;
 
         arraySpec.setVariable(key.getVarName());
-        Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
-        context.write(arraySpec, result, perGroupCount);
+        context.write(arraySpec, aRes, perGroupCount);
       }
 
       timer = System.currentTimeMillis() - timer;
+
+      System.out.println("Just wrote " + totalElements + " for map task " + 
+                         task.getId() + " with key2: " +
+                         arraySpec.toString() + 
+                         " and it took " + timer + " ms"); 
+      System.out.println("In total, wrote " + totalElements + " for "  + totalGroups + " groups");
+
     } catch ( Exception e ) {
-      System.out.println("Caught an exception in MedianMapperInt.map()" + e.toString() );
+      System.out.println("Caught an exception in AverageMapperShort.map()" + e.toString() );
       e.printStackTrace();
     }
   }
