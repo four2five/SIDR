@@ -39,6 +39,7 @@ public class DataIterator{
   private int[] _zeros;
   private long _rowCounter = 0;
   private int[] _retArray;
+  private short _currentValueShort;
   private int _currentValueInt;
   private double _currentValueDouble;
 
@@ -274,8 +275,15 @@ public class DataIterator{
     return this._groupHasMoreElements;
   }
 
+  public short getNextValueShort() throws IOException  { 
+    this._currentValueShort = this._bb.getShort((int)this._currentReadOffset);
+    incrementPos(this._dataTypeSize);
+
+    return this._currentValueShort;
+  }
+
   public int getNextValueInt() throws IOException  { 
-    this._currentValueInt = this._bb.getInt( (int)this._currentReadOffset );
+    this._currentValueInt = this._bb.getInt((int)this._currentReadOffset);
     incrementPos(this._dataTypeSize);
 
     return this._currentValueInt;

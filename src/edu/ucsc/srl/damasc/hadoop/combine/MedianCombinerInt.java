@@ -10,27 +10,27 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
-import edu.ucsc.srl.damasc.hadoop.io.HolisticResult;
+import edu.ucsc.srl.damasc.hadoop.io.HolisticResultInt;
 import edu.ucsc.srl.damasc.hadoop.io.Result;
 import edu.ucsc.srl.damasc.hadoop.Utils;
 
 /**
  * Combiner class for the Median operator
  */
-public class MedianCombiner extends 
-        Reducer<ArraySpec, HolisticResult, ArraySpec, HolisticResult> {
+public class MedianCombinerInt extends 
+        Reducer<ArraySpec, HolisticResultInt, ArraySpec, HolisticResultInt> {
 
-  private static final Log LOG = LogFactory.getLog(MedianCombiner.class);
-  static enum MedianCombinerStatus { FULL, NOTFULL, MERGED }
+  private static final Log LOG = LogFactory.getLog(MedianCombinerInt.class);
+  static enum MedianCombinerIntStatus { FULL, NOTFULL, MERGED }
 
   /**
    * Reduces values for a given key
    * @param key the Key for the given values being passed in
-   * @param values a List of HolisticResult objects to combine
+   * @param values a List of HolisticResultInt objects to combine
    * @param context the Context object for the currently executing job
    */
 
-  public void reduce(ArraySpec key, Iterable<HolisticResult> values, 
+  public void reduce(ArraySpec key, Iterable<HolisticResultInt> values, 
                      Context context)
                      throws IOException, InterruptedException {
 
@@ -42,10 +42,10 @@ public class MedianCombiner extends
                                  variableShape.length);
     long neededValues = Utils.calcTotalSize(extractionShape);
 
-    HolisticResult holVal = new HolisticResult();
+    HolisticResultInt holVal = new HolisticResultInt();
     holVal.setNeededCount( (int)neededValues );
 
-    for (HolisticResult value : values) {
+    for (HolisticResultInt value : values) {
       if ( holVal.isFull() ) {
         LOG.warn("Adding an element to an already full HR. Key: " + 
                  key.toString() + 
@@ -55,7 +55,7 @@ public class MedianCombiner extends
       }
 
       holVal.merge(value);
-      context.getCounter(MedianCombinerStatus.MERGED).increment(value.getCurrentCount());
+      context.getCounter(MedianCombinerIntStatus.MERGED).increment(value.getCurrentCount());
     }
 
     // now, the remainig holistic result should be full. Check though
@@ -64,9 +64,9 @@ public class MedianCombiner extends
       // sort and then pull the median out
       holVal.sort();
       holVal.setFinal( holVal.getValues()[(holVal.getValues().length)/2] );
-      context.getCounter(MedianCombinerStatus.FULL).increment(1);
+      context.getCounter(MedianCombinerIntStatus.FULL).increment(1);
     } else {                                                                
-      context.getCounter(MedianCombinerStatus.NOTFULL).increment(1);
+      context.getCounter(MedianCombinerIntStatus.NOTFULL).increment(1);
     }
 
     context.write(key, holVal);

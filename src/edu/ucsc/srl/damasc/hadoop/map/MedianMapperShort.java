@@ -14,16 +14,15 @@ import org.apache.hadoop.mapreduce.TaskID;
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.DataIterator;
-import edu.ucsc.srl.damasc.hadoop.io.HolisticResult;
+import edu.ucsc.srl.damasc.hadoop.io.HolisticResultShort;
 import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
 
 /**
  */
-public class MedianMapper extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResult> {
+public class MedianMapperShort extends Mapper<ArraySpec, MultiVarData, ArraySpec, HolisticResultShort> {
 
-  private static int DATATYPESIZE = 4;
   @SuppressWarnings("unused")
-private static final Log LOG = LogFactory.getLog(MedianMapper.class);
+private static final Log LOG = LogFactory.getLog(MedianMapperShort.class);
 
  /**
  * Reduces values for a given key
@@ -54,26 +53,30 @@ private static final Log LOG = LogFactory.getLog(MedianMapper.class);
 
       ArraySpec arraySpec = new ArraySpec(key.getCorner(), "");
       int extShapeSize = Utils.calcTotalSize(extractionShape);
-      HolisticResult result = new HolisticResult(extShapeSize);
+      HolisticResultShort result = new HolisticResultShort(extShapeSize);
+
+      Configuration conf = context.getConfiguration();
+      String varName = Utils.getVariableName(conf);
+      ByteBuffer inArray = inMVD.getVarDataByName(varName);
+      int datatypeSize = Utils.getDatatypeSize(conf);
 
       System.out.println("in mapper, corner is: " + 
                          Arrays.toString(key.getCorner()) + 
                          " shape: " + Arrays.toString(key.getShape())
                          + " extsize: " + extShapeSize + 
-                         " extShape: " + Arrays.toString(extractionShape));
-     
-      Configuration conf = context.getConfiguration();
-      String varName = Utils.getVariableName(conf);
-      ByteBuffer inArray = inMVD.getVarDataByName(varName);
+                         " extShape: " + Arrays.toString(extractionShape) + 
+                         " datatypeSize: " + datatypeSize);
 
       DataIterator dataItr = new DataIterator(inArray, key.getCorner(),
                                                   key.getShape(), extractionShape,
-                                                  DATATYPESIZE);
+                                                  datatypeSize);
       int[] tempGroup;
       int[] tempArray = new int[extractionShape.length];
       long totalElements = 0;
-      int medianValue = 0;
+      short medianValue = 0;
       int perGroupCount = 0;
+      short tempVal = -1;
+      int testGroup[] = {0,0,0,0};
 
       while( dataItr.hasMoreGroups() ) { 
         tempGroup = dataItr.getNextGroup();
@@ -83,7 +86,12 @@ private static final Log LOG = LogFactory.getLog(MedianMapper.class);
 
 
         while( dataItr.groupHasMoreValues() ) { 
-          result.setValue(dataItr.getNextValueInt());
+          tempVal = dataItr.getNextValueShort();
+          //result.setValue(dataItr.getNextValueShort());
+          if (Arrays.equals(tempGroup, testGroup)) { 
+            LOG.info("  v: " + tempVal);
+          }
+          result.setValue(tempVal);
           totalElements++;
           perGroupCount++;
         }
@@ -101,7 +109,7 @@ private static final Log LOG = LogFactory.getLog(MedianMapper.class);
 
       timer = System.currentTimeMillis() - timer;
     } catch ( Exception e ) {
-      System.out.println("Caught an exception in MedianMapper.map()" + e.toString() );
+      System.out.println("Caught an exception in MedianMapperShort.map()" + e.toString() );
       e.printStackTrace();
     }
   }

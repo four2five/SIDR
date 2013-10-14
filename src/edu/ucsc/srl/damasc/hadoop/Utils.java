@@ -38,6 +38,7 @@ public class Utils {
     public static final String REDUCER_SHAPE_WEIGHT = "damasc.reducer_shape_weight";
     public static final String CEPH_DEFAULT_URI = "damasc.ceph_uri";
     public static final String VARIABLE_NAME = "damasc.variable_name";
+    public static final String DATATYPE_SIZE = "damasc.datatype_size";
     public static final String COORDINATE_VARIABLE_NAME = "damasc.coordinate_variable_name";
     public static final String VARIABLES_TO_PERSIST = "damasc.variables_to_persist";
     public static final String COORDINATE_VARIABLE_DIM_NUM = "damasc.coordinate_variable_dimension";
@@ -217,6 +218,15 @@ public class Utils {
     public static String getVariableName(Configuration conf) {
       String varString = conf.get(VARIABLE_NAME, "");
       return varString;
+    }
+
+    public static int getDatatypeSize(Configuration conf) { 
+      int datatypeSize = conf.getInt(DATATYPE_SIZE, -1);
+      return datatypeSize;
+    }
+
+    public static void setDatatypeSize(Configuration conf, int datatypeSize) { 
+      conf.setInt(DATATYPE_SIZE, datatypeSize);
     }
 
     public static String getVariablesToPersist(Configuration conf) { 

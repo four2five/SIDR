@@ -13,15 +13,15 @@ import org.apache.hadoop.mapreduce.TaskID;
 
 import edu.ucsc.srl.damasc.hadoop.HadoopUtils;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
-import edu.ucsc.srl.damasc.hadoop.io.HolisticResult;
+import edu.ucsc.srl.damasc.hadoop.io.HolisticResultShort;
 
 /**
  * Reducer that simply iterates through the data it is passed
  */
-public class MedianReducer extends 
-        Reducer<ArraySpec, HolisticResult, ArraySpec, HolisticResult> {
+public class MedianReducerShort extends 
+        Reducer<ArraySpec, HolisticResultShort, ArraySpec, HolisticResultShort> {
 
-  private static final Log LOG = LogFactory.getLog(MedianReducer.class);
+  private static final Log LOG = LogFactory.getLog(MedianReducerShort.class);
 
   private int[] _extractionShape;
   private long _extShapeSize;
@@ -33,7 +33,7 @@ public class MedianReducer extends
     TaskID task = attempt.getTaskID();
     Configuration conf = context.getConfiguration();
     if( null == conf)  {
-      LOG.info("in MedianReducer.setup(), conf is non-existent");
+      LOG.info("in MedianReducerShort.setup(), conf is non-existent");
     }
 
     LOG.info("in reduce().setup for task: " + task.getId());
@@ -76,7 +76,7 @@ public class MedianReducer extends
    * for this key
    * @param context the Context object for the executing program
    */
-  public void reduce(ArraySpec key, Iterable<HolisticResult> values, 
+  public void reduce(ArraySpec key, Iterable<HolisticResultShort> values, 
                      Context context)
                      throws IOException, InterruptedException {
 
@@ -87,15 +87,15 @@ public class MedianReducer extends
 
     long timer = System.currentTimeMillis();
 
-    HolisticResult holResult = null;
+    HolisticResultShort holResult = null;
 
     try{ 
-      holResult = new HolisticResult(HadoopUtils.calcTotalSize(this._extractionShape));
+      holResult = new HolisticResultShort(HadoopUtils.calcTotalSize(this._extractionShape));
     } catch ( Exception e ) { 
       e.printStackTrace();
     }
 
-    for (HolisticResult value : values) {
+    for (HolisticResultShort value : values) {
       LOG.debug("Merging in " + value.getCurrentCount() + " elements for key: " + key.toString());
       holResult.merge(value);
     }
@@ -109,7 +109,7 @@ public class MedianReducer extends
       } 
       holResult.shrinkValuesArray(); // shrink the array down to the current size
       holResult.sort();
-      int medianValue = holResult.getValue(holResult.getCurrentCount()/2);
+      short medianValue = holResult.getValue(holResult.getCurrentCount()/2);
       holResult.setFinal(medianValue);
       context.write(key, holResult, holResult.getCurrentCount()); 
     }

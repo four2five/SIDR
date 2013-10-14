@@ -14,7 +14,7 @@ import org.apache.hadoop.io.Writable;
  * This class stores the (potentially partial) result
  * of a holistic computation (like median). 
  */
-public class HolisticResult implements Writable { 
+public class HolisticResultInt implements Writable { 
   private int[] _values = null; // the values needed to apply the holisitic function
   private int _currentCount = 0; // how many values are currently set
   private boolean _full = false;
@@ -23,7 +23,7 @@ public class HolisticResult implements Writable {
   /**
    * Empty constructor
    */
-  public HolisticResult() {
+  public HolisticResultInt() {
     //this._values = new int[1];
     this._values = null;
     this._currentCount = 0;
@@ -32,13 +32,13 @@ public class HolisticResult implements Writable {
   }
 
   @SuppressWarnings("unused")
-private static final Log LOG = LogFactory.getLog(HolisticResult.class);
+private static final Log LOG = LogFactory.getLog(HolisticResultInt.class);
 
   /** 
    * Constructor used to do fast creation
    * @param value a single value to integrate into this partial result
    */
-  public HolisticResult(int neededCount) throws Exception {
+  public HolisticResultInt(int neededCount) throws Exception {
     this._values = new int[neededCount];
     this._currentCount = 0;
     this._full = false;
@@ -51,7 +51,7 @@ private static final Log LOG = LogFactory.getLog(HolisticResult.class);
    * @param neededCount how many values are needed to generate a 
    * definitive result
    */
-  public HolisticResult(int neededCount, int value) throws Exception {
+  public HolisticResultInt(int neededCount, int value) throws Exception {
     this._values = new int[neededCount];
     this._currentCount = 0;
     this._full = false;
@@ -177,13 +177,13 @@ private static final Log LOG = LogFactory.getLog(HolisticResult.class);
   public void setValue(int value) throws IOException {
     if( this._values.length > 1 && this.isFull()) {
       throw new IOException("ERROR: adding an element to an already " + 
-                            "full HolisticResult object." +
+                            "full HolisticResultInt object." +
                             "Length: " + this._values.length);
     }
 
     if ( this._final == true ) {
       throw new IOException("ERROR: adding a value to a " +
-                            "HolisticResult that has been marked final");
+                            "HolisticResultInt that has been marked final");
     }
 
     //this accounts for previous use cases where this class defaulted
@@ -233,7 +233,7 @@ private static final Log LOG = LogFactory.getLog(HolisticResult.class);
    * TODO: optimize this by allocating _values here
    * @param values the array of values to add to this object
    */
-  public void setHolisticResult( int[] values ) throws IOException {
+  public void setHolisticResultInt( int[] values ) throws IOException {
     for ( int i=0; i<values.length; i++) {
       this.setValue(values[i]);
     }
@@ -250,19 +250,19 @@ private static final Log LOG = LogFactory.getLog(HolisticResult.class);
 
   /**
    * Initializes a result object with another result object
-   * @param result the HolisticResult object to use to initialize this
+   * @param result the HolisticResultInt object to use to initialize this
    * object
    */
-  public void setHolisticResult( HolisticResult result) throws IOException {
-    this.setHolisticResult( result.getValues());
+  public void setHolisticResultInt( HolisticResultInt result) throws IOException {
+    this.setHolisticResultInt( result.getValues());
     this.setFinal(result.isFinal());
   }
 
   /**
-   * Merges a HolisticResult object into this HolisticResult object
+   * Merges a HolisticResultInt object into this HolisticResultInt object
    * @param result the HolisiticResult object to merge into this object
    */
-  public void merge( HolisticResult result ) {
+  public void merge( HolisticResultInt result ) {
     try { 
 
       //System.out.println("Merging: " + result.getCurrentCount() + 
