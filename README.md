@@ -2,8 +2,8 @@ SIDR
 ====
 
 This code was used for the experimental portion of the SC '13 paper: http://sc13.supercomputing.org/schedule/event_detail.php?evid=pap313
-
-We're working on a more feature complete version of this code that should be posted shortly (Oct 2013).
+ 
+We're working on a more feature complete version of this code that should be posted shortly (Oct 2013). Keep an eye on the sc13_experiments_improved branch for that work.
 
 Installation 
 ====
