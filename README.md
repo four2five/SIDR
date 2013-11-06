@@ -39,8 +39,8 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `cd ../`   
    `git clone https://github.com/four2five/hadoop-common.git`   
    `cd hadoop-common`    
-   `git checkout buck_early_results_sc13`    
-   `ant mvn-install examples`    
+   `git checkout buck-2.2.0r-v1`    
+   ` mvn clean package -Pdist -DskipTests -Pnative`    
    * Configure hadoop however you want. Make sure that it works with wordcount (or some other comparable test ). I like this tutorial: http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/    
     * export HADOOP_HOME=/home/buck/git/hadoop-common    
     * export HADOOP_JAR=hadoop-core-1.0.4-early-results.jar    
@@ -49,7 +49,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
    `cd SIDR`     
-   `git checkout sc13_experiments`    
+   `git checkout origin/sc13_experiments_improved_hadoopv2`    
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    

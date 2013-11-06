@@ -102,11 +102,15 @@ public class MedianReducerInt extends
 
     // test if we've filled out the holistic result
     if( holResult.isFinal() ) { 
+      LOG.info("key1: " + key.toString() + " cc: " + holResult.getCurrentCount() + 
+               " es: " + this._extShapeSize); 
+      //context.write(key, holResult, holResult.getCurrentCount()); 
       context.write(key, holResult, this._extShapeSize); 
     } else { 
       if( !holResult.isFull() ) { 
         LOG.info("key: " + key.toString() + " NOT set to final: ");
       } 
+      LOG.info("key2: " + key.toString() + " recrep: " + holResult.getCurrentCount());
       holResult.shrinkValuesArray(); // shrink the array down to the current size
       holResult.sort();
       int medianValue = holResult.getValue(holResult.getCurrentCount()/2);
