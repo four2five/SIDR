@@ -97,7 +97,7 @@ private static final Log LOG = LogFactory.getLog(MedianMapperInt.class);
         arraySpec.setVariable(key.getVarName());
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
         context.write(arraySpec, result, perGroupCount);
-        LOG.info("k:- recrep: " + perGroupCount);
+        //LOG.info("k:- recrep: " + perGroupCount);
       }
 
       timer = System.currentTimeMillis() - timer;

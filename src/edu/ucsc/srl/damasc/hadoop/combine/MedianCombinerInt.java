@@ -42,7 +42,7 @@ public class MedianCombinerInt extends
         Utils.getExtractionShape(context.getConfiguration(), 
                                  variableShape.length);
     long _extShapeSize = Utils.calcTotalSize(extractionShape);
-    LOG.info("_extShapeSize: " + _extShapeSize);
+    //LOG.info("_extShapeSize: " + _extShapeSize);
     long neededValues = Utils.calcTotalSize(extractionShape);
 
     HolisticResultInt holVal = new HolisticResultInt();
@@ -68,15 +68,15 @@ public class MedianCombinerInt extends
       holVal.sort();
       holVal.setFinal( holVal.getValues()[(holVal.getValues().length)/2] );
       context.getCounter(MedianCombinerIntStatus.FULL).increment(1);
-      LOG.info("mci1: " + _extShapeSize);
+      //LOG.info("mci1: " + _extShapeSize);
       context.write(key, holVal, _extShapeSize);
     } else if (holVal.isFinal() ) {
       context.getCounter(MedianCombinerIntStatus.FULL).increment(1);
-      LOG.info("mci2: " + holVal.getCurrentCount());
+      //LOG.info("mci2: " + holVal.getCurrentCount());
       context.write(key, holVal, _extShapeSize);
     } else {                                                                
       context.getCounter(MedianCombinerIntStatus.NOTFULL).increment(1);
-      LOG.info("mci3: " + holVal.getCurrentCount());
+      //LOG.info("mci3: " + holVal.getCurrentCount());
       context.write(key, holVal, holVal.getCurrentCount());
     }
 
