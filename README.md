@@ -35,7 +35,17 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export NETCDF_HOME=/home/buck/git/thredds    
     * export NETCDF_JAR=netcdf-4.3.18.jar    
     * export CLASSPATH=$CLASSPATH:$NETCDF_HOME/cdm/target/$NETCDF_JAR    
-5. get our patched version of Hadoop (only necessary for the early results work)
+5. Install protobufs
+    * Note: You must install protobuf 2.5 or greater first. You can acquire the source code for that here:
+        `https://developers.google.com/protocol-buffers/`
+    `cd ~/
+    `mkdir installed`
+    `mkdir installed/protbuf` 
+    then cd into the directory containing the protobuf source code
+    `./configure --prefix=/home/buck/installed/protobuf` 
+    `./make` 
+    `./make install` 
+6. get our patched version of Hadoop (only necessary for the early results work)
    `cd ../`   
    `git clone https://github.com/four2five/hadoop-common.git`   
    `cd hadoop-common`    
@@ -45,7 +55,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export HADOOP_HOME=/home/buck/git/hadoop-common    
     * export HADOOP_JAR=hadoop-core-1.0.4-early-results.jar    
     * export PATH=$PATH:$HADOOP_HOME/bin    
-6. get the SIDR code (updated version of our SciHadoop code)
+7. get the SIDR code (updated version of our SciHadoop code)
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
    `cd SIDR`     
@@ -53,13 +63,13 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    
-7. generate test data    
+8. generate test data    
    `cd tools`    
    `ant jar`    
    `ant run`    
    `hadoop dfs -mkdir netcdf_input`    
    `hadoop dfs -put ./<generated filename> netcdf_input/file1.nc`    
-8. run a jobList    
+9. run a jobList    
    `cd ..`    
    `./scTestList.script`    
 
