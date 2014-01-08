@@ -36,15 +36,14 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export NETCDF_JAR=netcdf-4.3.18.jar    
     * export CLASSPATH=$CLASSPATH:$NETCDF_HOME/cdm/target/$NETCDF_JAR    
 5. Install protobufs
-    * Note: You must install protobuf 2.5 or greater first. You can acquire the source code for that here:
-        `https://developers.google.com/protocol-buffers/`
-    `cd ~/
-    `mkdir installed`
-    `mkdir installed/protbuf` 
-    then cd into the directory containing the protobuf source code
-    `./configure --prefix=/home/buck/installed/protobuf` 
-    `./make` 
-    `./make install` 
+    * Note: You must install protobuf 2.5 or greater first. You can acquire the source code for that here: `https://developers.google.com/protocol-buffers/`
+   `cd ~/
+   `mkdir installed`
+   `mkdir installed/protbuf` 
+   then cd into the directory containing the protobuf source code
+   `./configure --prefix=/home/buck/installed/protobuf` 
+   `./make` 
+   `./make install` 
 6. get our patched version of Hadoop (only necessary for the early results work)
    `cd ../`   
    `git clone https://github.com/four2five/hadoop-common.git`   
