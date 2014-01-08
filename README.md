@@ -37,7 +37,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export CLASSPATH=$CLASSPATH:$NETCDF_HOME/cdm/target/$NETCDF_JAR    
 5. Install protobufs
     * Note: You must install protobuf 2.5 or greater first. You can acquire the source code for that here: `https://developers.google.com/protocol-buffers/`
-   `cd ~/
+   `cd ~/`
    `mkdir installed`
    `mkdir installed/protbuf` 
    then cd into the directory containing the protobuf source code
