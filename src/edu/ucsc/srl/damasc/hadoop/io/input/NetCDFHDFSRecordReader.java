@@ -149,9 +149,9 @@ public class NetCDFHDFSRecordReader
       }
 
       // transfer the data
-      loadDataFromFile(); 
+      boolean retVal = loadDataFromFile(); 
 
-      return true;
+      return retVal;
     } else {
       this._timer = System.currentTimeMillis() - this._timer;
       LOG.debug("from init() to nextKeyValue() returning false, " +
@@ -168,7 +168,7 @@ public class NetCDFHDFSRecordReader
    * Currently this only supports IntWritable. Extend this 
    * to support other data types TODO
    */
-  private void loadDataFromFile() throws IOException {
+  private boolean loadDataFromFile() throws IOException {
     try { 
 
       // reuse the open variable if it's the correct one
@@ -186,6 +186,7 @@ public class NetCDFHDFSRecordReader
             "corner: " +   
             Arrays.toString(this._currentArraySpec.getCorner() ) + 
             " shape: " + Arrays.toString(this._currentArraySpec.getShape() ) );
+        return false;
       }
 
       LOG.warn( " File: " + this._currentArraySpec.getFileName() + 
@@ -232,6 +233,8 @@ public class NetCDFHDFSRecordReader
                             " shape: " + 
                             Arrays.toString(this._currentArraySpec.getShape()));
     }
+
+    return true;
   }
   
   /**  
