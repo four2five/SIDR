@@ -465,6 +465,9 @@ public class ArraySpec implements WritableComparable<ArraySpec>, Cloneable {
 	}
 	
 	public int hashCode() { 
+    int runningHash = 1;
+    runningHash = Arrays.hashCode(this._corner);
+    /*
 		int runningHash = 1;
 		runningHash *= 31 * Arrays.hashCode(this._corner);
 		// since a null shape and all 1's is equal, we need to treat them as such
@@ -480,6 +483,7 @@ public class ArraySpec implements WritableComparable<ArraySpec>, Cloneable {
 			//runningHash *= 31 * this._varName.hashCode();
 			runningHash *= this._varName.hashCode();
 		}
+    */
 		
 		return runningHash;
 	}
