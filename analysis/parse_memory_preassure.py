@@ -2,7 +2,6 @@
 import getopt, sys, re, time, datetime, itertools, os
 import numpy as np
 import matplotlib
-from datetime import datetime
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import statsmodels.tools as sm
@@ -57,12 +56,8 @@ def parseFile(taskTrackerLogFile):
 
   # first, parse out the "Adding buffer" lines
   #searchString = ".*Shuffle time (\d+) .* (\d+) bytes.*"
-  searchString1 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d).*Adding buffer.* (attempt_\d+_\d+_m_\d+_\d).*capacity: (\d+).*"
-  searchString2 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d).*Garbage collecting.* (attempt_\d+_\d+_m_\d+_\d).*capacity: (\d+).*"
-  searchString0 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d).*"
-
-  dateStringFormat =  '%Y-%m-%d %H:%M:%S,%f'
-
+  searchString1 = ".*Adding buffer.* (attempt_\d+_\d+_m_\d+_\d).*capacity: (\d+).*"
+  searchString2 = ".*Garbage collecting buffer.* (attempt_\d+_\d+_m_\d+_\d).*capacity: (\d+).*"
   ins = open(taskTrackerLogFile, "r")
   
   # for sanity checking
@@ -70,23 +65,11 @@ def parseFile(taskTrackerLogFile):
   validMallocLines = 0
   validFreeLines = 0
   currentlyUsedMemory = long(0)
-  firstTimeStamp = 0
 
   # We'll log times and the current amount of allocatted memory
   memoryChangeEvents = []
 
-  # this line basicaly says we were using zero MB of RAM at the start of the experiment
-  memoryChangeEvents.append((long(0),0))
-
   for line in ins:
-    if linesParsed == 0:
-      # this *should* always match as every line has a timestamp
-      matchObj0 = re.match(searchString0, line.lstrip())
-      timeString = matchObj0.group(1)
-      myDateTime = datetime.strptime(timeString, dateStringFormat)
-      #print "JB3, ", time.mktime(myDateTime.timetuple())
-      firstTime = time.mktime(myDateTime.timetuple())
-
     linesParsed = linesParsed + 1
 
     # first, see if the lines references memory changes
@@ -99,40 +82,31 @@ def parseFile(taskTrackerLogFile):
     # see if either matched 
       # is a malloc?
     elif matchObj1:
-      timeString = matchObj1.group(1)
-      myDateTime = datetime.strptime(timeString, dateStringFormat)
-      myTime =  time.mktime(myDateTime.timetuple())
-      deltaTime = myTime - firstTime
-      attempt = matchObj1.group(2)
-      eventMemorySize = long(matchObj1.group(3))
+      attempt = matchObj1.group(1)
+      eventMemorySize = long(matchObj1.group(2))
+      #print "line: ", line
+      #print "event mem size: ", eventMemorySize
       validMallocLines = validMallocLines + 1
       currentlyUsedMemory = currentlyUsedMemory + eventMemorySize
+      #print "\t\tmalloc ", eventMemorySize, " total: ", currentlyUsedMemory
+      print attempt, "\t", " + ", eventMemorySize
       # use the parsed line in leiu of time for now
-      memoryChangeEvents.append((long(deltaTime), currentlyUsedMemory / (1024 * 1024)))
-      #print deltaTime, " $ ", (currentlyUsedMemory / (1024 * 1024))
+      memoryChangeEvents.append((linesParsed, currentlyUsedMemory))
     # or a free?
     elif matchObj2:
-      timeString = matchObj2.group(1)
-      myDateTime = datetime.strptime(timeString, dateStringFormat)
-      #print "JB, ", myDateTime
-      myTime =  time.mktime(myDateTime.timetuple())
-      deltaTime = myTime - firstTime
-      attempt = matchObj2.group(2)
-      eventMemorySize = long(matchObj2.group(3))
+      attempt = matchObj2.group(1)
+      eventMemorySize = long(matchObj2.group(2))
       #print "line: ", line
       #print "event mem size: ", eventMemorySize
       validFreeLines = validFreeLines + 1
       currentlyUsedMemory = currentlyUsedMemory - eventMemorySize
       #print "\t\t free ", eventMemorySize, " total: ", currentlyUsedMemory
-      #print attempt, "\t", " - ", eventMemorySize
+      print attempt, "\t", " - ", eventMemorySize
       # use the parsed line in leiu of time for now
-      memoryChangeEvents.append((long(deltaTime), currentlyUsedMemory / (1024 * 1024)))
-      #print deltaTime, " $ ", (currentlyUsedMemory / (1024 * 1024))
+      memoryChangeEvents.append((linesParsed, currentlyUsedMemory))
 
 
-  #print "mallocs: ", validMallocLines, " frees: ", validFreeLines
-  if validMallocLines != validFreeLines:
-    print "ERROR, mallocs: ", validMallocLines, " != frees ", validFreeLines
+  print "mallocs: ", validMallocLines, " frees: ", validFreeLines
   return memoryChangeEvents
   
 def dumpData(parsedOutputFilename, arrayOfArraysOfArrays):
@@ -158,25 +132,15 @@ def presentData(arrayOfArraysOfTuples, ax1, plotLabels1, lns1):
 
   times = []
   sizes = []
-  maxSize = 0
-  totalSize = long(0)
   # iterate through each hosts dataset
   for hostDataset in arrayOfArraysOfTuples:
     for dataPoint in hostDataset:
       (time,size) = dataPoint
       times.append(time)
-      sizes.append(size)
-      #print time, " $ ", size
-      totalSize = totalSize + size
-      if size > maxSize:
-        maxSize = size
+      sizes.append(size / 1024) # convert into MBs
 
-
-  print "MaxSize: ", maxSize
-  print "totalSize: ", long(totalSize)
-  # plot each hosts data as it's parsed
-  #ax1.plot(times, sizes)
-  ax1.step(times, sizes, where='post')
+    # plot each hosts data as it's parsed
+    ax1.plot(times, sizes)
 
   ax1.grid()
 
@@ -234,26 +198,26 @@ def main():
 
       arrayOfArrays.append(array)
 
-      if parsedOutputFilename is not None:
-        dumpData(parsedOutputFilename, arrayOfArraysOfArrays)
-      else:
-        # now present it in some meaningful manner
-        #presentData(arrayOfArraysOfAverages, ax, plotLabels1, lns1)
-        presentData(arrayOfArrays, ax, plotLabels1, lns1)
+    if parsedOutputFilename is not None:
+      dumpData(parsedOutputFilename, arrayOfArraysOfArrays)
+    else:
+      # now present it in some meaningful manner
+      #presentData(arrayOfArraysOfAverages, ax, plotLabels1, lns1)
+      presentData(arrayOfArrays, ax, plotLabels1, lns1)
 
-        datasetNum = datasetNum + 1
+      datasetNum = datasetNum + 1
 
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Memory Consumed (MB) by Intermediate Data")
+      ax.set_xlabel("Time")
+      ax.set_ylabel("Memory Consumed (MB) by Intermediate Data")
     
-        #ax2.set_ylabel("Number of Shuffles")
-        #ax.legend(plotLabels1, loc='upper left')
+      #ax2.set_ylabel("Number of Shuffles")
+      #ax.legend(plotLabels1, loc='upper left')
 
-        #plt.tight_layout()
-        ax.set_title("Memory Usage Over Time SIDR-IM 168 Reducers")
-        #plt.show()
-        print "calling savefig"
-        plt.savefig("foo.pdf")
+      #plt.tight_layout()
+      ax.set_title("Memory Usage Over Time")
+      #plt.show()
+      print "calling savefig"
+      plt.savefig("foo.pdf")
 
 if __name__ == "__main__":
   main()
