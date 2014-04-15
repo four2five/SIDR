@@ -64,30 +64,16 @@ def parseFile(taskTrackerLogFile):
   dateStringFormat =  '%Y-%m-%d %H:%M:%S,%f'
 
   ins = open(taskTrackerLogFile, "r")
+
+  # we'll use a dict, key'd by buffer id, and record the add and delete time
+  myBufferIDDict = dict()
   
   # for sanity checking
   linesParsed = 0
   validMallocLines = 0
   validFreeLines = 0
-  currentlyUsedMemory = long(0)
-  firstTimeStamp = 0
-
-  # We'll log times and the current amount of allocatted memory
-  memoryChangeEvents = []
-
-  # this line basicaly says we were using zero MB of RAM at the start of the experiment
-  memoryChangeEvents.append((long(0),0))
 
   for line in ins:
-    if linesParsed == 0:
-      # this *should* always match as every line has a timestamp
-      matchObj0 = re.match(searchString0, line.lstrip())
-      timeString = matchObj0.group(1)
-      myDateTime = datetime.strptime(timeString, dateStringFormat)
-      #print "JB3, ", time.mktime(myDateTime.timetuple())
-      firstTime = time.mktime(myDateTime.timetuple())
-
-    linesParsed = linesParsed + 1
 
     # first, see if the lines references memory changes
     matchObj1 = re.match(searchString1, line.lstrip())
@@ -97,43 +83,60 @@ def parseFile(taskTrackerLogFile):
     if matchObj1 and matchObj2:
       print "ERROR: both regexs matched. Not good." 
     # see if either matched 
-      # is a malloc?
+      # is it a malloc?
     elif matchObj1:
       timeString = matchObj1.group(1)
       myDateTime = datetime.strptime(timeString, dateStringFormat)
-      myTime =  time.mktime(myDateTime.timetuple())
-      deltaTime = myTime - firstTime
+      myTime =  long(time.mktime(myDateTime.timetuple()))
+
+      #byBufferIDDict = dict()
+  
       attempt = matchObj1.group(2)
-      eventMemorySize = long(matchObj1.group(3))
       validMallocLines = validMallocLines + 1
-      currentlyUsedMemory = currentlyUsedMemory + eventMemorySize
-      # use the parsed line in leiu of time for now
-      memoryChangeEvents.append((long(deltaTime), currentlyUsedMemory / (1024 * 1024)))
-      #print deltaTime, " $ ", (currentlyUsedMemory / (1024 * 1024))
+
+      #print attempt, " $ ", myTime
+
+      if attempt in myBufferIDDict:
+        print "ERROR: this attempt was already"
+      else:
+        myBufferIDDict[attempt] = []
+        myBufferIDDict[attempt].append(myTime)
+
     # or a free?
     elif matchObj2:
       timeString = matchObj2.group(1)
       myDateTime = datetime.strptime(timeString, dateStringFormat)
-      #print "JB, ", myDateTime
-      myTime =  time.mktime(myDateTime.timetuple())
-      deltaTime = myTime - firstTime
+      myTime =  long(time.mktime(myDateTime.timetuple()))
+
       attempt = matchObj2.group(2)
-      eventMemorySize = long(matchObj2.group(3))
-      #print "line: ", line
-      #print "event mem size: ", eventMemorySize
       validFreeLines = validFreeLines + 1
-      currentlyUsedMemory = currentlyUsedMemory - eventMemorySize
-      #print "\t\t free ", eventMemorySize, " total: ", currentlyUsedMemory
-      #print attempt, "\t", " - ", eventMemorySize
-      # use the parsed line in leiu of time for now
-      memoryChangeEvents.append((long(deltaTime), currentlyUsedMemory / (1024 * 1024)))
-      #print deltaTime, " $ ", (currentlyUsedMemory / (1024 * 1024))
 
+      #print attempt, " $ ", myTime
 
-  #print "mallocs: ", validMallocLines, " frees: ", validFreeLines
+      if attempt in myBufferIDDict:
+        myBufferIDDict[attempt].append(myTime)
+      else:
+        print "ERROR: found a free before we found a malloc"
+
+  cacheDurationArray = []
+  # now, roll through the dict and calculate how long each
+  # task was in the cache
+  for attempt in myBufferIDDict.keys():
+    data = myBufferIDDict[attempt]
+    if len(data) <2:
+      print "ERROR: found an attempt with a start and no end"
+    else:
+      startTime = long(data[0])
+      endTime = long(data[1])
+      deltaTime = endTime - startTime
+      cacheDurationArray.append(deltaTime)
+      print "delta: ", deltaTime
+
+  print "mallocs: ", validMallocLines, " frees: ", validFreeLines
   if validMallocLines != validFreeLines:
     print "ERROR, mallocs: ", validMallocLines, " != frees ", validFreeLines
-  return memoryChangeEvents
+  print "len(myBufferIDDict): ", len(myBufferIDDict)
+  return cacheDurationArray
   
 def dumpData(parsedOutputFilename, arrayOfArraysOfArrays):
   times = []
@@ -154,29 +157,28 @@ def dumpData(parsedOutputFilename, arrayOfArraysOfArrays):
 
   outputStream.close()
 
-def presentData(arrayOfArraysOfTuples, ax1, plotLabels1, lns1):
+def presentData(arrayOfArrays, ax1, plotLabels1, lns1):
 
   times = []
-  sizes = []
-  maxSize = 0
-  totalSize = long(0)
+  maxTime = 0
+  totalTime = long(0)
   # iterate through each hosts dataset
-  for hostDataset in arrayOfArraysOfTuples:
-    for dataPoint in hostDataset:
-      (time,size) = dataPoint
-      times.append(time)
-      sizes.append(size)
+  for perHostTimes in arrayOfArrays:
+    for singleTime in perHostTimes:
+      times.append(singleTime)
       #print time, " $ ", size
-      totalSize = totalSize + size
-      if size > maxSize:
-        maxSize = size
+      totalTime = totalTime + singleTime
+      if singleTime > maxTime:
+        maxTime = singleTime
 
 
-  print "MaxSize: ", maxSize
-  print "totalSize: ", long(totalSize)
-  # plot each hosts data as it's parsed
-  #ax1.plot(times, sizes)
-  ax1.step(times, sizes, where='post')
+  print "MaxTime: ", maxTime
+  print "totalTime: ", long(totalTime)
+
+  sortedTimes = sorted(times)
+
+  #ax1.plot(sortedTimes)
+  ax1.hist(sortedTimes, bins=40)
 
   ax1.grid()
 
@@ -230,9 +232,9 @@ def main():
     arrayOfArrays = []
 
     for filename in filesToParse:
-      array = parseFile(dirToRead + "/" + filename)
+      outArray = parseFile(dirToRead + "/" + filename)
 
-      arrayOfArrays.append(array)
+      arrayOfArrays.append(outArray)
 
       if parsedOutputFilename is not None:
         dumpData(parsedOutputFilename, arrayOfArraysOfArrays)
@@ -243,14 +245,12 @@ def main():
 
         datasetNum = datasetNum + 1
 
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Memory Consumed (MB) by Intermediate Data")
+        ax.set_xlabel("Time Spent in In-Memory Cache (seconds)")
+        ax.set_ylabel("Count of Map Outputs in Bin")
     
-        #ax2.set_ylabel("Number of Shuffles")
-        #ax.legend(plotLabels1, loc='upper left')
 
-        #plt.tight_layout()
-        ax.set_title("Memory Usage Over Time SIDR-IM 168 Reducers")
+        plt.tight_layout()
+        ax.set_title("Distribution of Intermediate Output Cache Residency Durations")
         #plt.show()
         print "calling savefig"
         plt.savefig("foo.pdf")
