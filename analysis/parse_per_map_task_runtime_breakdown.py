@@ -53,13 +53,14 @@ def usage():
 
 
 def parseSubDir(subdirToParse):
-  #print "parsing subdir ", subdirToParse
+  print "parsing subdir ", subdirToParse
 
   # we always want to parse the "syslog" file in the subdir
   #searchString = "(sd[a-d]1)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)"
   #searchString = "Shuffle time (\d+)(\d+) bytes"
+  #2014-04-15 15:31:38,218 INFO edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSRecordReader: IO time: 4293 for 155520000 bytes
   #searchString1 = "IO time: 4179 for 103680000 bytes"
-  searchString1 = ".*IO time: (\d+) for (\d+) bytes.*"
+  searchString1 = ".*IO time: (\d+) for (\d+) byte.*"
   #searchString2 = "2014-04-15 16:57:18,292 INFO edu.ucsc.srl.damasc.hadoop.map.MedianMapperInt: in mapper, corner is: [352, 0, 0, 0] shape: [2, 360, 720, 50] extsize: 25920 extShape: [2, 36, 36, 10] datatypeSize: 4"
   searchString2 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) INFO edu.ucsc.srl.damasc.hadoop.map.*in mapper.*"
   searchString3 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) INFO edu.ucsc.srl.damasc.hadoop.map.*: Wrote out.*"
@@ -76,14 +77,14 @@ def parseSubDir(subdirToParse):
   linesParsed = 0
   ioTime = None
 
-  mapStartTime = None
-  mapEndTime = None
+  mapStartDateTime = None
+  mapEndDateTime = None
 
-  registerOutputStartTime = None
-  registerOutputEndTime = None
+  registerOutputStartDateTime = None
+  registerOutputEndDateTime = None
 
-  commitStartTime = None
-  commitEndTime = None
+  commitStartDateTime = None
+  commitEndDateTime = None
 
   for line in ins:
     linesParsed = linesParsed + 1
@@ -95,7 +96,7 @@ def parseSubDir(subdirToParse):
         print "ERROR, found two IO times"
         sys.exit(2)
       else:
-        ioTime = long(matchObj1.group(1)) / 1000 # convert milliseconds to seconds
+        ioTime = long(matchObj1.group(1))  # convert milliseconds to seconds
         ioSize = matchObj1.group(2)
         #print "Found ioTime: " + str(ioTime)
         #print line
@@ -105,25 +106,25 @@ def parseSubDir(subdirToParse):
     matchObj2 = re.match(searchString2, line.lstrip())
 
     if matchObj2:
-      if mapStartTime is not None:
+      if mapStartDateTime is not None:
         print "ERROR, found two map start times"
         sys.exit(2)
       else:
         nextLineIsMapRuntime = True
         timeString = matchObj2.group(1)
-        myDateTime = datetime.strptime(timeString, dateStringFormat)
-        mapStartTime =  long(time.mktime(myDateTime.timetuple()))
+        mapStartDateTime = datetime.strptime(timeString, dateStringFormat)
+        #mapStartTime =  long(time.mktime(myDateTime.timetuple()))
         #print "Found mapStartTime: " + str(mapStartTime)
         #print line
         continue
 
     # this should only occur once, when the previous line was the mapStartTime
-    if mapStartTime is not None and mapEndTime is None:
+    if mapStartDateTime is not None and mapEndDateTime is None:
       matchObj3 = re.match(searchString3, line.lstrip())
       if matchObj3:
         timeString = matchObj3.group(1)
-        myDateTime = datetime.strptime(timeString, dateStringFormat)
-        mapEndTime =  long(time.mktime(myDateTime.timetuple()))
+        mapEndDateTime = datetime.strptime(timeString, dateStringFormat)
+        #mapEndTime =  long(time.mktime(myDateTime.timetuple()))
         #print "Found mapEndTime: " + str(mapEndTime)
         #print line
         continue
@@ -134,23 +135,23 @@ def parseSubDir(subdirToParse):
     matchObj4 = re.match(searchString4, line.lstrip())
 
     if matchObj4:
-      if registerOutputStartTime is not None:
+      if registerOutputStartDateTime is not None:
         print "ERROR, found two register output start times"
         sys.exit(2)
       else:
         timeString = matchObj4.group(1)
-        myDateTime = datetime.strptime(timeString, dateStringFormat)
-        registerOutputStartTime =  long(time.mktime(myDateTime.timetuple()))
+        registerOutputStartDateTime = datetime.strptime(timeString, dateStringFormat)
+        #registerOutputStartTime =  long(time.mktime(myDateTime.timetuple()))
         #print "Found registerOutputStartTime: " + str(registerOutputStartTime)
         #print line
         continue
 
     # this should only occur once, when the previous line was the mapStartTime
-    if registerOutputStartTime is not None and registerOutputEndTime is None:
+    if registerOutputStartDateTime is not None and registerOutputEndDateTime is None:
       matchObj5 = re.match(searchString5, line.lstrip())
       timeString = matchObj5.group(1)
-      myDateTime = datetime.strptime(timeString, dateStringFormat)
-      registerOutputEndTime =  long(time.mktime(myDateTime.timetuple()))
+      registerOutputEndDateTime = datetime.strptime(timeString, dateStringFormat)
+      #registerOutputEndTime =  long(time.mktime(myDateTime.timetuple()))
       #print "Found registerOutputEndTime: " + str(registerOutputEndTime)
       #print line
       continue
@@ -158,24 +159,24 @@ def parseSubDir(subdirToParse):
     matchObj6 = re.match(searchString6, line.lstrip())
 
     if matchObj6:
-      if commitStartTime is not None:
+      if commitStartDateTime is not None:
         print "ERROR, found two commit start times"
         sys.exit(2)
       else:
         timeString = matchObj6.group(1)
-        myDateTime = datetime.strptime(timeString, dateStringFormat)
-        commitStartTime =  long(time.mktime(myDateTime.timetuple()))
+        commitStartDateTime = datetime.strptime(timeString, dateStringFormat)
+        #commitStartTime =  long(time.mktime(myDateTime.timetuple()))
         #print "Found commitStartTime: " + str(commitStartTime)
         #print line
         continue
 
     # this should only occur once, when the previous line was the commitStartTime
-    if commitStartTime is not None and commitEndTime is None:
+    if commitStartDateTime is not None and commitEndDateTime is None:
       matchObj7 = re.match(searchString7, line.lstrip())
       if matchObj7:
         timeString = matchObj7.group(1)
-        myDateTime = datetime.strptime(timeString, dateStringFormat)
-        commitEndTime =  long(time.mktime(myDateTime.timetuple()))
+        commitEndDateTime = datetime.strptime(timeString, dateStringFormat)
+        #commitEndTime =  long(time.mktime(myDateTime.timetuple()))
         #print "Found commitEndTime: " + str(commitEndTime)
         #print line
         continue
@@ -187,27 +188,41 @@ def parseSubDir(subdirToParse):
 
   if ioTime is None:
     print subdirToParse + " MISSING ioTime"
-  if mapStartTime is None or mapEndTime is None:
+  if mapStartDateTime is None or mapEndDateTime is None:
     print subdirToParse + " MISSING mapTime"
-  if registerOutputStartTime is None or registerOutputEndTime is None:
+  if registerOutputStartDateTime is None or registerOutputEndDateTime is None:
     print subdirToParse + " MISSING registerOutput"
-  if commitStartTime is None or commitEndTime is None:
+  if commitStartDateTime is None or commitEndDateTime is None:
     print subdirToParse + " MISSING commitOutput"
 
   # the last task has no entries. Assume that we've hit that Map task
-  if ioTime is None and mapStartTime is None and registerOutputStartTime is None:
+  if ioTime is None and mapStartDateTime is None and registerOutputStartDateTime is None:
     return None
 
   #print "ioTime: " + str(ioTime)
-  #print "mapTime: " + str(long(mapEndTime) - long(mapStartTime)) 
-  #print "registerOutputTime: " + str(long(registerOutputEndTime) - long(registerOutputStartTime)) 
-  #print "commitTime: " + str(long(commitEndTime) - long(commitStartTime)) 
+  #print "mapTime: " + str(mapEndDateTime - mapStartDateTime) 
+  #print "registerOutputTime: " + str(registerOutputEndDateTime - registerOutputStartDateTime) 
+  #print "commitTime: " + str(commitEndDateTime - commitStartDateTime) 
+
+  # convert timedeltas to milliseconds
+  mapTimeMillis = ((mapEndDateTime - mapStartDateTime).seconds * 1000) + \
+                     ((mapEndDateTime - mapStartDateTime).microseconds / 1000)
+  registerOutputTimeMillis = ((registerOutputEndDateTime - registerOutputStartDateTime).seconds * 1000) + \
+                     ((registerOutputEndDateTime - registerOutputStartDateTime).microseconds / 1000)
+  commitTimeMillis = ((commitEndDateTime - commitStartDateTime).seconds * 1000) + \
+                     ((commitEndDateTime - commitStartDateTime).microseconds / 1000)
+  #print "mapTime2: " + str(mapTimeMillis) 
+  #print "registerOutput2: " + str(registerOutputTimeMillis) 
+  #print "commit2: " + str(commitTimeMillis) 
 
   #retArray = []
   retArray.append(ioTime)
-  retArray.append(long(mapEndTime) - long(mapStartTime))
-  retArray.append(long(registerOutputEndTime) - long(registerOutputStartTime))
-  retArray.append(long(commitEndTime) - long(commitStartTime))
+  #retArray.append(mapEndDateTime - mapStartDateTime)
+  #retArray.append(registerOutputEndDateTime - registerOutputStartDateTime)
+  #retArray.append(commitEndDateTime - commitStartDateTime)
+  retArray.append(mapTimeMillis)
+  retArray.append(registerOutputTimeMillis)
+  retArray.append(commitTimeMillis)
 
   return retArray
   
@@ -323,6 +338,14 @@ def main():
     for filename in filesToParse:
       data1 = []
       data2 = []
+      #attempt_201404151524_0002_m_000970_0
+      attemptSearchString = "(attempt_\d+_\d+_m_\d+_\d)"
+      attemptMatchObj = re.match(attemptSearchString, filename.lstrip())
+      if attemptMatchObj:
+        pass
+      else:    # if this doesn't match a map attempt, continue to the next file name
+        print "Skipping: " + filename
+        continue
 
       toRead = dirToRead + "/" + filename
 
