@@ -36,7 +36,7 @@ def usage():
   print "./create_shuffle_time_graph.py <file to parse>[,<another file to parse>]"
 
 
-def presentData(ioTime, mapTime, registerOutputTime, commitTime, ax, datasetNum):
+def presentData(ioTime, mapTime, registerOutputTime, commitTime, taskTime, ax, datasetNum, plotName):
 
   runningTotal = 0
   for time in ioTime:
@@ -45,7 +45,7 @@ def presentData(ioTime, mapTime, registerOutputTime, commitTime, ax, datasetNum)
   ioTime.sort()
   #ax.hist(np.array(ioTime), bins=40, label="IO Time", alpha=0.10, hatch=hatchStyles[0])
   fit = stats.norm.pdf(ioTime, np.mean(ioTime), np.std(ioTime))
-  ax.plot(ioTime, fit, linestyle=lineStyles[0], label="IO Time")
+  #ax.plot(ioTime, fit, linestyle=lineStyles[datasetNum], label="IO Time " + plotName)
   print "ioTime min: " + str(ioTime[0]) + " max: " + str(ioTime[-1])
   print "Total ioTime: " + str(runningTotal) + " avg: " + str(runningTotal / len(ioTime))
   print "ioTime avg: " + str(np.mean(ioTime)) + " stddev: " + str(np.std(ioTime))
@@ -57,7 +57,7 @@ def presentData(ioTime, mapTime, registerOutputTime, commitTime, ax, datasetNum)
   #ax.hist(np.array(mapTime), bins=40, label="Map Time", alpha=0.2, hatch=hatchStyles[1])
   mapTime.sort()
   fit = stats.norm.pdf(mapTime, np.mean(mapTime), np.std(mapTime))
-  ax.plot(mapTime, fit, linestyle=lineStyles[1], label="Map Time")
+  #ax.plot(mapTime, fit, linestyle=lineStyles[datasetNum], label="Map Time " + plotName)
   print "mapTime min: " + str(mapTime[0]) + " max: " + str(mapTime[-1])
   print "Total mapTime: " + str(runningTotal) + " avg: " + str(runningTotal / len(mapTime))
   print "mapTime avg: " + str(np.mean(mapTime)) + " stddev: " + str(np.std(mapTime))
@@ -81,10 +81,22 @@ def presentData(ioTime, mapTime, registerOutputTime, commitTime, ax, datasetNum)
   #ax.hist(np.array(commitTime), bins=40, label="Commit Time", alpha=0.4, hatch=hatchStyles[3])
   commitTime.sort()
   fit = stats.norm.pdf(commitTime, np.mean(commitTime), np.std(commitTime))
-  ax.plot(commitTime, fit, linestyle=lineStyles[3], label="Commit Time")
+  #ax.plot(commitTime, fit, linestyle=lineStyles[datasetNum], label="Commit Time " + plotName)
   print "commitTime min: " + str(commitTime[0]) + " max: " + str(commitTime[-1])
   print "Total commitTime: " + str(runningTotal) + " avg: " + str(runningTotal / len(commitTime))
   print "commitTime avg: " + str(np.mean(commitTime)) + " stddev: " + str(np.std(commitTime))
+
+  runningTotal = 0
+  for time in taskTime:
+    runningTotal = runningTotal + time
+
+  #ax.hist(np.array(commitTime), bins=40, label="Commit Time", alpha=0.4, hatch=hatchStyles[3])
+  taskTime.sort()
+  fit = stats.norm.pdf(taskTime, np.mean(taskTime), np.std(taskTime))
+  ax.plot(taskTime, fit, linestyle=lineStyles[datasetNum], label="Task Time " + plotName)
+  print "taskTime min: " + str(taskTime[0]) + " max: " + str(taskTime[-1])
+  print "Total taskTime: " + str(runningTotal) + " avg: " + str(runningTotal / len(taskTime))
+  print "taskTime avg: " + str(np.mean(taskTime)) + " stddev: " + str(np.std(taskTime))
 
   ax.grid()
 
@@ -129,6 +141,7 @@ def main():
       mapTime = []
       registerOutputTime = []
       commitTime = []
+      taskTime = []
 
       # the input was already formatted, just read it in
       if formattedInputFile:
@@ -143,11 +156,12 @@ def main():
           elif columnHeaderLine is None:
             columnHeaderLine = line
           else: 
-            (d1, d2, d3, d4) = line.rstrip().split("$")
+            (d1, d2, d3, d4, d5) = line.rstrip().split("$")
             ioTime.append(long(d1))
             mapTime.append(long(d2))
             registerOutputTime.append(long(d3))
             commitTime.append(long(d4))
+            taskTime.append(long(d5))
 
         ins.close()
 
@@ -156,12 +170,12 @@ def main():
         print "This is wrong, you should be parsing a formatted output file"
         sys.exit(2)
 
-      presentData(ioTime, mapTime, registerOutputTime, commitTime, ax, datasetNum)  
+      presentData(ioTime, mapTime, registerOutputTime, commitTime, taskTime, ax, datasetNum, plotName)  
       print "adding graph for ", plotName
       datasetNum = datasetNum + 1
 
     ax.set_xlabel("Shuffle Time (milliseconds)")
-    ax.set_ylabel("Reduce Tasks per Bin")
+    ax.set_ylabel("Fraction of Map Tasks")
     #ax.set_ylim(top=70)
 
     #ax2.set_ylim(top=105)
@@ -183,7 +197,7 @@ def main():
     #plt.yscale('log', nonposy='clip')
     #plt.xscale('log', nonposy='clip')
     #ax.set_yscale('log')
-    ax.set_xlim([0, 30000])
+    ax.set_xlim([0, 40000])
     ax.set_title("Map Phase Times InMemory 168 Reducers")
     #print "calling show()"
     #plt.show()
