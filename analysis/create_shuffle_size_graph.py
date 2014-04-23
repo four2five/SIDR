@@ -31,11 +31,15 @@ markerStyleList.append("2")
 markerStyleList.append(",")
 markerStyleList.append("1")
 
-perExpLabelList = []
-perExpLabelList.append("rMB/s")
-perExpLabelList.append("wMB/s")
-perExpLabelList.append("util")
+#perExpLabelList = []
+#perExpLabelList.append("SciHadoop 22 Reducers")
+#perExpLabelList.append("SIDR 22 Reducers")
 
+crossHatchList = []
+crossHatchList.append("/")
+crossHatchList.append('\\')
+crossHatchList.append('+')
+crossHatchList.append('.')
 
 ##################
 # 
@@ -48,123 +52,76 @@ perExpLabelList.append("util")
 def usage():
   print "./parse_loggedfs.py <file to parse>[,<another file to parse>]"
 
-
-def parseFile(fileToParse):
-  print "parsing ", fileToParse
-
-  # order of columns
-  # rrqm/s  wrqm/s  r/s w/s rmB/s wmB/s avgrq-sz  avgqu-sz await r_await w_await svctm %util
-  #searchString = "(sd[a-d]1)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)"
-  searchString = "(sda1)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)\s*(\d+\.\d+)"
-  ins = open(fileToParse, "r")
-  
-  # for sanity checking
-  linesParsed = 0
-  validLines = 0
-  tmpData1 = []
-  tmpData2 = []
-  tmpData3 = []
-
-  retArray = []
-
-  for line in ins:
-    linesParsed = linesParsed + 1
-    # we only want to store reads and writes, filter out the rest
-    matchObj = re.match(searchString, line)
-
-    if matchObj:
-      validLines = validLines + 1
-      #print "1: ", matchObj.group(1), "2: ", matchObj.group(2), " 14: ", matchObj.group(14)
-      tmpData1.append(float(matchObj.group(6)))
-      tmpData2.append(float(matchObj.group(7)))
-      tmpData3.append(float(matchObj.group(14)))
-
-  retArray.append(tmpData1)
-  retArray.append(tmpData2)
-  retArray.append(tmpData3)
-
-  return retArray
-
-
-# from http://wiki.scipy.org/Cookbook/SignalSmooth  
-def smooth(x, window_len=10, window='hanning'):
-    """smooth the data using a window with requested size.
-    
-    This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal 
-    (with the window size) in both ends so that transient parts are minimized
-    in the begining and end part of the output signal.
-    
-    input:
-        x: the input signal 
-        window_len: the dimension of the smoothing window
-        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
-            flat window will produce a moving average smoothing.
-
-    output:
-        the smoothed signal
-        
-    example:
-
-
-    import numpy as np    
-    t = np.linspace(-2,2,0.1)
-    x = np.sin(t)+np.random.randn(len(t))*0.1
-    y = smooth(x)
-    
-    see also: 
-    
-    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
-    scipy.signal.lfilter
- 
-    TODO: the window parameter could be the window itself if an array instead of a string   
-    """
-
-    if x.ndim != 1:
-        raise ValueError, "smooth only accepts 1 dimension arrays."
-
-    if x.size < window_len:
-        raise ValueError, "Input vector needs to be bigger than window size."
-
-    if window_len < 3:
-        return x
-
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
-
-    s=np.r_[2*x[0]-x[window_len:1:-1], x, 2*x[-1]-x[-1:-window_len:-1]]
-    #print(len(s))
-
-    
-    if window == 'flat': #moving average
-        w = np.ones(window_len,'d')
-    else:
-        w = getattr(np, window)(window_len)
-    y = np.convolve(w/w.sum(), s, mode='same')
-    return y[window_len-1:-window_len+1]
-
 # input is two arrays, representing time and size for the shuffles from a given
 # MapReduce job
-def presentData(data1, data2, plotName, ax, plotLabels1, datasetNum, lns1):
+def presentData(sizeData, plotName, ax, plotLabels):
 
-  myTimesBins = [0, 100, 250, 500, 1000, 1500, 2000, 3000, 4000, 5000, 10000]
-               # 0kb, 1kb, 10kb, 100kb, 1MB, 10MB, 50MB, 100MB
+  print "len(sizeData): " + str(len(sizeData))
+  print "len(sizeData[0]): " + str(len(sizeData[0]))
+
   #mySizesBins = [0, 1024, 10240, 51200, 1048576]
-  mySizesBins = [0, 1, 10, 25, 50, 75, 100, 120]
-  #ax.hist(np.array(data1), 10)
-  ax.hist(np.array(data2), mySizesBins, alpha=(0.25 * (datasetNum+1)), histtype='stepfilled')
+  #mySizesBins = [0, 1, 10, 25, 50, 75, 100, 120]
+  mySizesBins = [0, 1, 5, 10, 20, 40, 60, 80, 100, 120, 140]
+  index = np.arange(len(mySizesBins) -1)
+  print "index: " + str(index)
+  width = 0.40
+  gap = 0.05
+  binnedData = []
+  for runData in sizeData:
+    #print "crossHatchList[" + str(datasetNum) + "]: " + str(crossHatchList[datasetNum])
+    #ax.hist(np.array(sizes), mySizesBins, alpha=(0.20 * (datasetNum+1)), histtype='stepfilled', edgecolor="black", hatch=crossHatchList[datasetNum])
+    #(n, retBins, patches) = np.histogram(np.array(sizes), mySizesBins, alpha=(0.20 * (datasetNum+1)), histtype='bar', edgecolor="black", hatch=crossHatchList[datasetNum])
+    (n, retBins)  = np.histogram(runData, mySizesBins)
+    binnedData.append(n)
+    print "bins: "
+    for element in retBins:
+      print "\t" + str(element)
+
+    print "n: " 
+    for element in n:
+      print "\t" + str(element)
+
+  counter = 0
+  rects = []
+  for dataset in binnedData:
+    tempRect = ax.bar(index + (counter * width), np.array(dataset),  \
+            width - gap, \
+            #alpha = (counter + 1) * 0.2, \
+            alpha = 0.4, \
+            hatch=crossHatchList[counter], \
+            color=lineColorList[counter], \
+            label=plotLabels[counter], \
+            )
+    counter = counter + 1
+    rects.append(tempRect)
+
+  # set the xticks_labels
+  xlabels = [item.get_text() for item in ax.get_xticklabels()]
+  print "len(xlabels): " + str(len(xlabels)) + " len(mySizesBins): " + str(len(mySizesBins))
+  for x in range(len(xlabels)):
+    xlabels[x] = str(mySizesBins[x+1])
+
+  ax.set_xticklabels(xlabels)
+  ax.set_xticks(index+width)
+
+  # try adding the actual values into the graph
+  def autolabel(rects):
+    # attach some text labels
+    for rect in rects:
+      height = rect.get_height()   
+      if height > 0:
+        print "height: " + str(height)
+        #ax.text(rect.get_x()+rect.get_width()/2., height + 100, '%d'%int(height), \
+        ax.text(rect.get_x()+rect.get_width()/2., height + 30, '%d'%int(height), \
+                ha='center', va='bottom')
+
+  for myRect in rects:
+    autolabel(myRect)
+
 
   #lns1.append(line)
   print "adding plotLabel ", plotName
-  plotLabels1.append(plotName)
 
-  #plotLabels.append(figureLabelList[foo])
-  #ax.hist(sortedValues, histtype='step')
-  #ax.hist(np.array(data1), histtype='step', label=perExpLabelList[0], color=lineColorList[datasetNum])
-  #ax.hist(np.array(data2), histtype='step', label=perExpLabelList[1], color=lineColorList[datasetNum])
-  #ax.set_title("Seeks per second histogram")
-
-  #ax.set_yscale('log')
   ax.grid()
 
 def main():
@@ -200,15 +157,15 @@ def main():
     # create the larger plot
     fig = plt.figure(figsize=myFigSize)
     ax = fig.add_subplot(111)
-    plotLabels1 = []
-    plotLabels2 = []
     lns1 = []
     lns2 = []
     datasetNum = 0
+    dataArray = []
+    plotLabels = []
 
     for filename in filesToParse:
-      data1 = []
-      data2 = []
+      timeData = []
+      sizeData = []
 
       # the input was already formatted, just read it in
       if formattedInputFile:
@@ -221,43 +178,36 @@ def main():
             plotName = line
           else: 
             d1, d2 = line.rstrip().split("$")
-            #print key, " $ ", count
-            #bucketedSeeks[key.rstrip()] = int(count.rstrip())
-            data1.append(long(d1) / 1000000)
-            data2.append(long(d2) / 1024)
+            timeData.append(long(d1) / 1000000) # turn nano seconds into milliseconds
+            sizeData.append(long(d2) / (1024*1024)) # turn bytes into MB
+            #print d2 + " : " + str(long(d2) / (1024*1024))
 
         ins.close()
-
+        dataArray.append(sizeData)
+        plotLabels.append(plotName)
       # else, parse the raw log files
       else:
         # pull out the per-second seek rates
-        (data1, data2) = parseFile(filename)
+        (timeData, sizeData) = parseFile(filename)
+        dataArray.append(sizeData)
 
       # now present it in some meaningful manner
-      presentData(data1, data2, plotName, ax, plotLabels1, datasetNum, lns1)  
-      #plotLabels.append(figureLabelList[datasetNum])
-      #print "adding graph for ", figureLabelList[datasetNum]
-      print "adding graph for ", plotName
-      datasetNum = datasetNum + 1
+      # data1 -> time, data2 -> sizes
+
+    presentData(dataArray, plotName, ax, plotLabels)  
+    #print "adding graph for ", plotName 
 
     ax.set_xlabel("Shuffle Size (MB)")
-    ax.set_ylabel("Reduce Tasks per Bin")
+    ax.set_ylabel("Unique Shuffles per Bin")
 
-
-    #newLns1 = itertools.chain.from_iterable(lns1)
-    #ax.legend(newLns1, plotLabels1, loc='upper left')
-    ax.legend(plotLabels1, loc='upper right')
+    ax.legend(loc='upper right')
 
     plt.tight_layout()
 
-    #ax.set_xscale('log')
-    #ax.set_xscale('log')
-    #ax.semilogx()
-    #ax.set_yscale('log')
-    #plt.xscale('log', nonposy='clip')
-    plt.yscale('log', nonposy='clip')
-    ax.set_title("Per Reduce Task Shuffle Sizes")
-    #plt.legend(plotLabels, 'upper left')
+    (ylim_low, ylim_high)= ax.get_ylim()
+    ylim_high = ylim_high * 1.05
+    ax.set_ylim(ylim_low, ylim_high)
+    ax.set_title("Per Shuffle Transfer Sizes")
     #print "calling show()"
     #plt.show()
     print "calling savefig"
