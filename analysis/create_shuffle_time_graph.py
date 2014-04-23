@@ -85,15 +85,9 @@ def presentData(timeData, ax):
   ax.set_xticklabels(myXLabels)
 
   # try adding the actual values into the graph
-  def autolabel(rects):
-    # attach some text labels
-    for rect in rects:
-      height = rect.get_height()
-      if height > 0:
-        print "height: " + str(height)
-        #ax.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%d'%int(height), \
-        ax.text(rect.get_x()+rect.get_width()/2., height + 100, '%d'%int(height), \
-                ha='center', va='bottom')
+  def autolabel(bp):
+    myMedian = bp['medians']
+    print "bp: " + str(bp) + " median: " + str(myMedian)
 
   for myRect in rects:
     autolabel(myRect)
