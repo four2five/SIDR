@@ -56,19 +56,19 @@ def presentData(totalIoTimes, totalMapTimes, totalRegisterOutputTimes, totalComm
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
 
-    bp = plt.boxplot(totalIoTimes[counter],positions=[(3.5+(counter * gap))])
+    bp = plt.boxplot(totalIoTimes[counter],positions=[(3+(counter * gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
 
-    bp = plt.boxplot(totalMapTimes[counter], positions=[(5.5+(counter*gap))])
+    bp = plt.boxplot(totalMapTimes[counter], positions=[(5+(counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
 
-    bp = plt.boxplot(totalRegisterOutputTimes[counter], positions=[(7.5 + (counter*gap))])
+    bp = plt.boxplot(totalRegisterOutputTimes[counter], positions=[(7 + (counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
 
-    bp = plt.boxplot(totalCommitTimes[counter], positions=[(9.5+(counter*gap))])
+    bp = plt.boxplot(totalCommitTimes[counter], positions=[(9+(counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
 
@@ -191,8 +191,8 @@ def main():
 
     plt.tight_layout()
     ax.set_xticklabels(['Total Time', 'Input IO', 'Apply Map()', 'Register Output', 'Commit'])
-    ax.set_xticks([1.175, 3.65, 5.65, 7.65, 9.65])
-    ax.set_xlim(0,12)
+    ax.set_xticks([1.175, 3.15, 5.15, 7.15, 9.15])
+    ax.set_xlim(0,10)
 
     ax.set_ylim([0, 45000])
     ax.set_title("Map Task Per-Phase Breakdown (InMemory 168 Reducers)")
