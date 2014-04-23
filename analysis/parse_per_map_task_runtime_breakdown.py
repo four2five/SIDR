@@ -69,12 +69,17 @@ def parseSubDir(subdirToParse):
   #2014-04-15 15:31:52,284 INFO org.apache.hadoop.mapred.Task: Task:attempt_201404151524_0002_m_000238_0 is done. And is in the process of commiting
   searchString6 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) .*And is in the process of commiting.*"
   searchString7 = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) .*done.*"
+  genericTimestampSearchString = "(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d).*"
   dateStringFormat =  '%Y-%m-%d %H:%M:%S,%f'
   ins = open(subdirToParse + "/syslog", "r")
   
   # for sanity checking
   retArray = []
   linesParsed = 0
+
+  matchObj0 = None
+  taskStartDateTime = None
+  taskEndDateTime = None
   ioTime = None
 
   mapStartDateTime = None
@@ -87,6 +92,18 @@ def parseSubDir(subdirToParse):
   commitEndDateTime = None
 
   for line in ins:
+    # grab every line, since we'll need the last to graph the total task runtime
+
+    matchObj0 = re.match(genericTimestampSearchString, line.lstrip())
+    if (linesParsed == 0): # parse out the first timestamp in the task
+      if matchObj0:
+        timeString = matchObj0.group(1)
+        taskStartDateTime = datetime.strptime(timeString, dateStringFormat)
+      else:
+        print "ERROR, first task line does not have a timestamp"
+        print "\n" + line
+
+
     linesParsed = linesParsed + 1
     # we only want to store reads and writes, filter out the rest
     matchObj1 = re.match(searchString1, line.lstrip())
@@ -186,6 +203,13 @@ def parseSubDir(subdirToParse):
         print subdirToParse
         continue
 
+  # set the taskEndTime
+  if matchObj0:
+    timeString = matchObj0.group(1)
+    taskEndDateTime = datetime.strptime(timeString, dateStringFormat)
+  else:
+    print "ERROR, the last line didn't have a timestamp"
+
   if ioTime is None:
     print subdirToParse + " MISSING ioTime"
   if mapStartDateTime is None or mapEndDateTime is None:
@@ -193,6 +217,8 @@ def parseSubDir(subdirToParse):
   if registerOutputStartDateTime is None or registerOutputEndDateTime is None:
     print subdirToParse + " MISSING registerOutput"
   if commitStartDateTime is None or commitEndDateTime is None:
+    print subdirToParse + " MISSING commitOutput"
+  if taskStartDateTime is None or taskEndDateTime is None:
     print subdirToParse + " MISSING commitOutput"
 
   # the last task has no entries. Assume that we've hit that Map task
@@ -211,6 +237,8 @@ def parseSubDir(subdirToParse):
                      ((registerOutputEndDateTime - registerOutputStartDateTime).microseconds / 1000)
   commitTimeMillis = ((commitEndDateTime - commitStartDateTime).seconds * 1000) + \
                      ((commitEndDateTime - commitStartDateTime).microseconds / 1000)
+  taskTimeMillis = ((taskEndDateTime - taskStartDateTime).seconds * 1000) + \
+                     ((taskEndDateTime - taskStartDateTime).microseconds / 1000)
   #print "mapTime2: " + str(mapTimeMillis) 
   #print "registerOutput2: " + str(registerOutputTimeMillis) 
   #print "commit2: " + str(commitTimeMillis) 
@@ -223,19 +251,21 @@ def parseSubDir(subdirToParse):
   retArray.append(mapTimeMillis)
   retArray.append(registerOutputTimeMillis)
   retArray.append(commitTimeMillis)
+  retArray.append(taskTimeMillis)
 
   return retArray
   
 def dumpData(parsedOutputFilename, arrayOfArraysOfArrays):
   outputStream = open(parsedOutputFilename, "w")
   outputStream.write(expName + "\n")
-  outputStream.write("ioTime$mapTime$registerOutputTime$commitTime\n")
+  outputStream.write("ioTime$mapTime$registerOutputTime$commitTime$taskTime\n")
 
   # iterate through all of the variables 
   for perMapData in arrayOfArraysOfArrays:
-    (ioTime, mapTime, registerOutputTime, commitTime) = perMapData
+    (ioTime, mapTime, registerOutputTime, commitTime, taskTime) = perMapData
     outputStream.write(str(str(ioTime) +  "$" +  str(mapTime) + "$" + \
-                           str(registerOutputTime) + "$" + str(commitTime) + "\n"))
+                           str(registerOutputTime) + "$" + str(commitTime) + "$" + \
+                           str(taskTime) + str("\n")))
 
   outputStream.close()
 
