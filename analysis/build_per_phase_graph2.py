@@ -55,22 +55,29 @@ def presentData(totalIoTimes, totalMapTimes, totalRegisterOutputTimes, totalComm
     bp = plt.boxplot(totalTaskTimes[counter],positions=[(1+(counter * gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
+    setCaps(bp, ax, counter, totalTaskTimes[counter])
+    #printCaps(bp, ax, counter, totalTaskTimes[counter])
 
-    bp = plt.boxplot(totalIoTimes[counter],positions=[(3+(counter * gap))])
+    bp = plt.boxplot(totalIoTimes[counter],positions=[(3.5+(counter * gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
+    setCaps(bp, ax, counter, totalIoTimes[counter])
 
-    bp = plt.boxplot(totalMapTimes[counter], positions=[(5+(counter*gap))])
+    bp = plt.boxplot(totalMapTimes[counter], positions=[(5.5+(counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
+    setCaps(bp, ax, counter, totalMapTimes[counter])
 
-    bp = plt.boxplot(totalRegisterOutputTimes[counter], positions=[(7 + (counter*gap))])
+    bp = plt.boxplot(totalRegisterOutputTimes[counter], positions=[(7.5 + (counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
+    setCaps(bp, ax, counter, totalRegisterOutputTimes[counter])
+    printCaps(bp, ax, counter, totalRegisterOutputTimes[counter])
 
-    bp = plt.boxplot(totalCommitTimes[counter], positions=[(9+(counter*gap))])
+    bp = plt.boxplot(totalCommitTimes[counter], positions=[(9.5+(counter*gap))])
     setColors(bp, lineColorList[counter])
     showMedianValues(bp, ax, counter)
+    setCaps(bp, ax, counter, totalCommitTimes[counter])
 
     counter = counter + 1
 
@@ -97,7 +104,85 @@ def showMedianValues(bp, ax, datasetNum):
     else:
       ax.text( (x-0.5) + (datasetNum * 0.85), y, '%d' % y,
           horizontalalignment='center') # draw above, centered
-    
+
+def printCaps(bp, ax, datasetNum, data):
+  print "in printCaps"
+  print "whiskers"
+  for line in  bp['whiskers']:
+    print str(datasetNum) + " whiskers: " + str(line.get_ydata())
+
+  print "caps"
+  for line in  bp['caps']:
+    print str(datasetNum) + " caps: " + str(line.get_ydata())
+
+def setCaps(bp, ax, datasetNum, data):
+  # whiskers always come out as low, then high. Use counter to set the correct one
+  funcCounter = 0
+
+  myWhiskers = bp['whiskers']
+  myCaps = bp['caps']
+
+  for line in  myWhiskers:
+    print str(datasetNum) + " whiskers start as: " + str(line.get_ydata())
+
+  for line in myCaps:
+    # get position data for median line
+    #x, y = line.get_xydata()[1] # top of median line
+    x, y = line.get_xydata() 
+    # overlay median value
+    print str(datasetNum) + " caps start as x, y: ", str(x), ":", str(y) 
+
+    # calculate the 95th percentile
+    my95th = np.percentile(data, 95)
+    print "95th percentile: " + str(my95th)
+
+    my75th = np.percentile(data, 75)
+    print "75th percentile: " + str(my75th)
+
+    my25th = np.percentile(data, 25)
+    print "25th percentile: " + str(my25th)
+
+
+    # calculate the 5th percentile
+    my5th = np.percentile(data, 5)
+    print "5th percentile: " + str(my5th)
+
+    if funcCounter == 1:
+      print "setting 5th percentile"
+      line.set_ydata(np.array([my5th, my5th]))
+
+      # set the whishkers for the lower cap
+      print "set " + str(myWhiskers[0].get_ydata()) + " to " + str(my5th)
+      print "set " + str(myWhiskers[0].get_ydata()[1]) + " to " + str(my5th)
+      tempYData = myWhiskers[0].get_ydata()
+      tempYData[1] = my5th
+      myWhiskers[0].set_ydata(tempYData)
+
+    elif funcCounter == 0:
+      print "setting 95th percentile"
+      line.set_ydata(np.array([my95th, my95th]))
+
+      # set the whishkers for the upper cap
+      print "set " + str(myWhiskers[1].get_ydata()) + " to " + str(my95th)
+      print "set " + str(myWhiskers[1].get_ydata()[1]) + " to " + str(my95th)
+      tempYData = myWhiskers[1].get_ydata()
+      tempYData[1] = my95th
+      myWhiskers[1].set_ydata(tempYData)
+
+    else:
+      print "ERROR, funcCounter is too large in setCaps"
+
+    funcCounter = funcCounter + 1
+
+  print "caps"
+  for line in bp['caps']:
+    x, y = line.get_xydata() 
+    print str(datasetNum) + " x, y: ", str(x), ":", str(y) 
+
+  print "whiskers"
+  for line in bp['whiskers']:
+    x, y = line.get_xydata() 
+    print str(datasetNum) + " x, y: ", str(x), ":", str(y) 
 
 def main():
   try:
@@ -191,10 +276,10 @@ def main():
 
     plt.tight_layout()
     ax.set_xticklabels(['Total Time', 'Input IO', 'Apply Map()', 'Register Output', 'Commit'])
-    ax.set_xticks([1.175, 3.15, 5.15, 7.15, 9.15])
-    ax.set_xlim(0,10)
+    ax.set_xticks([1.175, 3.65, 5.65, 7.65, 9.65])
+    ax.set_xlim(0,12)
 
-    ax.set_ylim([0, 45000])
+    ax.set_ylim([0, 50000])
     ax.set_title("Map Task Per-Phase Breakdown (InMemory 168 Reducers)")
     #print "calling show()"
     #plt.show()
