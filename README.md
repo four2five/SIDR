@@ -49,10 +49,11 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
    `cd SIDR`     
-   `git checkout sc13_experiments`    
+   `git checkout sc13_experiments_improved`    
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    
+  * Check out the files in the hadoop_conf_files directory. You will want to use these as a template for your hadoop configuration files (especially the HADOOP_CLASSPATH lines)
 7. generate test data    
    `cd tools`    
    `ant jar`    
