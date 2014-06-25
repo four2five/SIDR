@@ -53,6 +53,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    
+  * Check out the files in the `hadoop_conf_files` directory. You will want to set most, if not all, of these values in your configuration files (especially the HADOOP_PATH ones)
 7. generate test data    
    `cd tools`    
    `ant jar`    
