@@ -14,16 +14,22 @@ import org.apache.hadoop.util.ToolRunner;
 
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.Utils.PartitionerClass;
+import edu.ucsc.srl.damasc.hadoop.io.AverageResultDouble;
+import edu.ucsc.srl.damasc.hadoop.io.AverageResultFloat;
 import edu.ucsc.srl.damasc.hadoop.io.AverageResultInt;
 import edu.ucsc.srl.damasc.hadoop.io.AverageResultShort;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.NetCDFHDFSTools;
 import edu.ucsc.srl.damasc.hadoop.io.input.ArrayBasedFileInputFormat;
+import edu.ucsc.srl.damasc.hadoop.map.AverageMapperDouble;
+import edu.ucsc.srl.damasc.hadoop.map.AverageMapperFloat;
 import edu.ucsc.srl.damasc.hadoop.map.AverageMapperInt;
 import edu.ucsc.srl.damasc.hadoop.map.AverageMapperShort;
 import edu.ucsc.srl.damasc.hadoop.partition.ArraySpecPartitioner;
-import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerShort;
+import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerDouble;
+import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerFloat;
 import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerInt;
+import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerShort;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
@@ -125,6 +131,28 @@ public class Average extends Configured implements Tool {
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
       job.setOutputValueClass(AverageResultShort.class);
+    } else if (DataType.DOUBLE == dataType) { 
+      job.setMapperClass(AverageMapperDouble.class);
+      job.setReducerClass(AverageReducerDouble.class);
+
+	    // mapper output
+	    job.setMapOutputKeyClass(ArraySpec.class);
+	    job.setMapOutputValueClass(AverageResultDouble.class);
+
+      // reducer output
+      job.setOutputKeyClass(ArraySpec.class);
+      job.setOutputValueClass(AverageResultDouble.class);
+    } else if (DataType.FLOAT == dataType) { 
+      job.setMapperClass(AverageMapperFloat.class);
+      job.setReducerClass(AverageReducerFloat.class);
+
+	    // mapper output
+	    job.setMapOutputKeyClass(ArraySpec.class);
+	    job.setMapOutputValueClass(AverageResultFloat.class);
+
+      // reducer output
+      job.setOutputKeyClass(ArraySpec.class);
+      job.setOutputValueClass(AverageResultFloat.class);
     }
 	
 
@@ -153,6 +181,10 @@ public class Average extends Configured implements Tool {
 			  job.setCombinerClass(AverageReducerInt.class);
       } else if (DataType.SHORT == dataType) { 
 			  job.setCombinerClass(AverageReducerShort.class);
+      } else if (DataType.DOUBLE == dataType) { 
+			  job.setCombinerClass(AverageReducerDouble.class);
+      } else if (DataType.FLOAT == dataType) { 
+			  job.setCombinerClass(AverageReducerFloat.class);
       } else { 
         System.out.println("!!!! ERROR: a combiner was specified but one is not available for this data type");
       }

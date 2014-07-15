@@ -14,18 +14,27 @@ import org.apache.hadoop.util.ToolRunner;
 
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.Utils.PartitionerClass;
+import edu.ucsc.srl.damasc.hadoop.combine.MedianCombinerDouble;
+import edu.ucsc.srl.damasc.hadoop.combine.MedianCombinerFloat;
 import edu.ucsc.srl.damasc.hadoop.combine.MedianCombinerInt;
 import edu.ucsc.srl.damasc.hadoop.combine.MedianCombinerShort;
+import edu.ucsc.srl.damasc.hadoop.io.HolisticResultDouble;
+import edu.ucsc.srl.damasc.hadoop.io.HolisticResultFloat;
 import edu.ucsc.srl.damasc.hadoop.io.HolisticResultInt;
 import edu.ucsc.srl.damasc.hadoop.io.HolisticResultShort;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.NetCDFHDFSTools;
 import edu.ucsc.srl.damasc.hadoop.io.input.ArrayBasedFileInputFormat;
+import edu.ucsc.srl.damasc.hadoop.io.output.NetCDFFileOutputFormat;
+import edu.ucsc.srl.damasc.hadoop.map.MedianMapperDouble;
+import edu.ucsc.srl.damasc.hadoop.map.MedianMapperFloat;
 import edu.ucsc.srl.damasc.hadoop.map.MedianMapperInt;
 import edu.ucsc.srl.damasc.hadoop.map.MedianMapperShort;
 import edu.ucsc.srl.damasc.hadoop.partition.ArraySpecPartitioner;
-import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerShort;
+import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerDouble;
+import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerFloat;
 import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerInt;
+import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerShort;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
@@ -127,11 +136,34 @@ public class Median extends Configured implements Tool {
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
       job.setOutputValueClass(HolisticResultShort.class);
+    } else if (DataType.DOUBLE == dataType) { 
+      job.setMapperClass(MedianMapperDouble.class);
+      job.setReducerClass(MedianReducerDouble.class);
+
+	    // mapper output
+	    job.setMapOutputKeyClass(ArraySpec.class);
+	    job.setMapOutputValueClass(HolisticResultDouble.class);
+
+      // reducer output
+      job.setOutputKeyClass(ArraySpec.class);
+      job.setOutputValueClass(HolisticResultDouble.class);
+    } else if (DataType.FLOAT == dataType) { 
+      job.setMapperClass(MedianMapperFloat.class);
+      job.setReducerClass(MedianReducerFloat.class);
+
+	    // mapper output
+	    job.setMapOutputKeyClass(ArraySpec.class);
+	    job.setMapOutputValueClass(HolisticResultFloat.class);
+
+      // reducer output
+      job.setOutputKeyClass(ArraySpec.class);
+      job.setOutputValueClass(HolisticResultFloat.class);
     }
 	
 
     job.setInputFormatClass(NetCDFHDFSFileInputFormat.class);
-    job.setOutputFormatClass(TextOutputFormat.class);
+    //job.setOutputFormatClass(TextOutputFormat.class);
+    job.setOutputFormatClass(NetCDFFileOutputFormat.class);
 
     PartitionerClass partitionerClass = Utils.getPartitionerClass(conf);
     if( PartitionerClass.hash == partitionerClass) { 
@@ -155,6 +187,10 @@ public class Median extends Configured implements Tool {
 			  job.setCombinerClass(MedianCombinerInt.class);
       } else if (DataType.SHORT == dataType) { 
 			  job.setCombinerClass(MedianCombinerShort.class);
+      } else if (DataType.DOUBLE == dataType) { 
+			  job.setCombinerClass(MedianCombinerDouble.class);
+      } else if (DataType.FLOAT == dataType) { 
+			  job.setCombinerClass(MedianCombinerFloat.class);
       } else { 
         System.out.println("!!!! ERROR: a combiner was specified but one is not available for this data type");
       }

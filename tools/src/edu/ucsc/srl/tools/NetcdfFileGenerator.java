@@ -11,10 +11,11 @@ import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
-import ucar.ma2.ArrayObject;
+import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.ArrayInt;
 import ucar.ma2.ArrayLong;
+import ucar.ma2.ArrayObject;
 import ucar.ma2.ArrayShort;
 import ucar.ma2.Index;
 import ucar.ma2.IteratorFast;
@@ -81,6 +82,18 @@ public class NetcdfFileGenerator {
                 iter.getLongNext();
                 iter.setLongCurrent(tempLong);
                 tempLong++;
+            }
+
+            ncFile.write(variable.getVariableName(),array);
+        } else if ( variable.getType() == DataType.DOUBLE)  {
+            array = new ArrayDouble(dimensions);
+            long tempDouble = 0;
+            IndexIterator iter = array.getIndexIterator();
+
+            while (iter.hasNext() ) {
+                iter.getDoubleNext();
+                iter.setDoubleCurrent(tempDouble);
+                tempDouble++;
             }
 
             ncFile.write(variable.getVariableName(),array);
@@ -262,6 +275,8 @@ public class NetcdfFileGenerator {
                       // uncomment this line for an incrementing value
                       iter.setIntCurrent(valueCounter);
                       valueCounter++;
+                      if (valueCounter < 0) 
+                        valueCounter = 0;
 
                       // book keeping
                       writtenSoFar++;
@@ -284,6 +299,56 @@ public class NetcdfFileGenerator {
                       // uncomment this line for an incrementing value
                       iter.setShortCurrent((short)valueCounter);
                       valueCounter++;
+                      if ((short)valueCounter < 0) 
+                        valueCounter = (short)0;
+
+                      // book keeping
+                      writtenSoFar++;
+                      //origin.incr();
+                  }
+
+                  System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                     ". var_name: " + varName  + 
+                                     " origin: " + arrayToString(origin.getCurrentCounter()) + 
+                                     " writeSize: " + array.getSize() + 
+                                     " write shape: " + arrayToString(singleStep) );
+                } else if (DataType.DOUBLE == dataType) { 
+                  array = new ArrayDouble(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                      iter.getDoubleNext();
+                      // uncomment the following line for a random distribution
+                      //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                      // uncomment this line for an incrementing value
+                      iter.setDoubleCurrent((double)valueCounter);
+                      valueCounter++;
+                      if ((double)valueCounter < 0) 
+                        valueCounter = (int)((double)0);
+
+                      // book keeping
+                      writtenSoFar++;
+                      //origin.incr();
+                  }
+
+                  System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                     ". var_name: " + varName  + 
+                                     " origin: " + arrayToString(origin.getCurrentCounter()) + 
+                                     " writeSize: " + array.getSize() + 
+                                     " write shape: " + arrayToString(singleStep) );
+                } else if (DataType.FLOAT == dataType) { 
+                  array = new ArrayFloat(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                      iter.getFloatNext();
+                      // uncomment the following line for a random distribution
+                      //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                      // uncomment this line for an incrementing value
+                      iter.setFloatCurrent((float)valueCounter);
+                      valueCounter++;
+                      if ((float)valueCounter < 0) 
+                        valueCounter = (int)((float)0);
 
                       // book keeping
                       writtenSoFar++;
@@ -296,6 +361,13 @@ public class NetcdfFileGenerator {
                                      " writeSize: " + array.getSize() + 
                                      " write shape: " + arrayToString(singleStep) );
                 }
+
+                if (null == varName) 
+                  System.out.println("varName is null");
+                if (origin.getCurrentCounter() == null)
+                  System.out.println("getCurrentCounter() is null");
+                if (array == null)
+                  System.out.println("array is null");
 
                 // write to the actual file
                 ncFile.write(varName, origin.getCurrentCounter(), array);
@@ -346,7 +418,16 @@ public class NetcdfFileGenerator {
 
         Date now = new Date();
         Random generator = new Random( now.getTime() );
-        int valueCounter = writeSeed;
+        int valueCounter = 0;
+        if (DataType.DOUBLE == dataType) { 
+          valueCounter = (int)((double)0);
+        } else if (DataType.INT == dataType) { 
+          valueCounter = (int)0;
+        } else if (DataType.SHORT == dataType) { 
+          valueCounter = (short)0;
+        } else if (DataType.FLOAT == dataType) { 
+          valueCounter = 0;
+        }
 
         String filename = Long.toString(now.getTime()) + "." + dataType.toString() + ".nc";
 
@@ -411,16 +492,22 @@ public class NetcdfFileGenerator {
 
         String variableName1 = "windspeed1"; // this is for the measurement actually in this data set
         String variableName2 = "windspeed2"; // this is for the measurement actually in this data set
+        String variableName3 = "windspeed3"; // this is for the measurement actually in this data set
+        String variableName4 = "windspeed4"; // this is for the measurement actually in this data set
         DataType dataType1 = DataType.INT; // data type for the actual data
         DataType dataType2 = DataType.SHORT; // data type for the actual data
+        DataType dataType3 = DataType.DOUBLE; // data type for the actual data
+        DataType dataType4 = DataType.FLOAT; // data type for the actual data
 
         NetcdfFileGenerator myGen = new NetcdfFileGenerator(); 
         //int numFiles = 1;
         int writeSeed = 0;
 
         //for ( int i = 0; i < numFiles; i++) { 
-          writeSeed = myGen.createFile(variableName1, dataType1, writeSeed);
-          writeSeed = myGen.createFile(variableName2, dataType2, writeSeed);
+          writeSeed = myGen.createFile(variableName1, dataType1, 0);
+          writeSeed = myGen.createFile(variableName2, dataType2, 0);
+          writeSeed = myGen.createFile(variableName3, dataType3, 0);
+          writeSeed = myGen.createFile(variableName4, dataType4, 0);
         //}
 
     }

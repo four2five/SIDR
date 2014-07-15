@@ -133,9 +133,11 @@ public class NetCDFTools {
     return dims;
   }
 
+  /*
   public static int getDataTypeSize(String inputFilePath, String variableName, Configuration conf) {
 
     // hard coding this to 4 since we're only testing with ints ATM
     return 4;
   }
+  */
 }

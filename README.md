@@ -55,6 +55,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export SCIHADOOP_JAR=SIDR.jar    
   * Check out the files in the hadoop_conf_files directory. You will want to use these as a template for your hadoop configuration files (especially the HADOOP_CLASSPATH lines)
 7. generate test data    
+  * NOTE: this will generate several files, one per data type supported. Only test against one of these files at a time
    `cd tools`    
    `ant jar`    
    `ant run`    

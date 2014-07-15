@@ -105,11 +105,16 @@ public class MedianReducerShort extends
       context.write(key, holResult, this._extShapeSize); 
     } else { 
       if( !holResult.isFull() ) { 
-        LOG.info("key: " + key.toString() + " NOT set to final: ");
-      } 
+        LOG.info("key: " + key.toString() + " NOT set to final. Count: " + holResult.getCurrentCount());
+      } else {
+        LOG.info("key: " + key.toString() + " set to final");
+      }
       holResult.shrinkValuesArray(); // shrink the array down to the current size
       holResult.sort();
+      short first = holResult.getValue(0);
       short medianValue = holResult.getValue(holResult.getCurrentCount()/2);
+      short last  = holResult.getValue(holResult.getCurrentCount() -1);
+      LOG.info("first: " + first + " median: " + medianValue + " last: " + last);
       holResult.setFinal(medianValue);
       context.write(key, holResult, holResult.getCurrentCount()); 
     }

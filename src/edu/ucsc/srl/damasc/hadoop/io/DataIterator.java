@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.ucsc.srl.damasc.hadoop.Utils;
 
 public class DataIterator{ 
@@ -27,7 +30,6 @@ public class DataIterator{
 
   private long _currentReadOffset; 
 
-
   private long[] _strides;  
   private int _dataTypeSize;
   private ByteBuffer _bb;
@@ -42,6 +44,10 @@ public class DataIterator{
   private short _currentValueShort;
   private int _currentValueInt;
   private double _currentValueDouble;
+  private float _currentValueFloat;
+  private boolean _dumpAllValues = false;
+
+  private static final Log LOG = LogFactory.getLog(DataIterator.class);
 
   public DataIterator() { 
   }
@@ -54,8 +60,17 @@ public class DataIterator{
     this._bufferLogicalShape = Arrays.copyOf(logicalShape, logicalShape.length);
     this._extractionShape = Arrays.copyOf(extractionShape, extractionShape.length);
     this._dataTypeSize = dataTypeSize;
+    LOG.info("in DataIterator(), corner: " + Arrays.toString(logicalCorner) + 
+             " shape: " + Arrays.toString(logicalShape) + 
+             " exShape: " + Arrays.toString(extractionShape) + 
+             " dataTypeSize: " + dataTypeSize);
     this._hasMoreGroups = true;
     this._nDims = this._bufferLogicalShape.length;
+
+    int testGroup[] = {0,0,0,0};
+    if (Arrays.equals(_globalCorner, testGroup)) { 
+      _dumpAllValues = true;
+    }
 
     this._ones = new int[this._nDims];
     this._zeros = new int[this._nDims];
@@ -277,6 +292,9 @@ public class DataIterator{
 
   public short getNextValueShort() throws IOException  { 
     this._currentValueShort = this._bb.getShort((int)this._currentReadOffset);
+    if (_dumpAllValues) {
+      //LOG.info("\t" + (int)this._currentReadOffset + " : " + this._currentValueShort);
+    }
     incrementPos(this._dataTypeSize);
 
     return this._currentValueShort;
@@ -294,6 +312,13 @@ public class DataIterator{
     incrementPos(this._dataTypeSize);
 
     return this._currentValueDouble;
+  }
+
+  public float getNextValueFloat() throws IOException  { 
+    this._currentValueFloat = this._bb.getFloat( (int)this._currentReadOffset );
+    incrementPos(this._dataTypeSize);
+
+    return this._currentValueFloat;
   }
 
   private void incrementPos(int dataTypeSize) throws IOException { 

@@ -1,9 +1,10 @@
 package edu.ucsc.srl.damasc.hadoop.io;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +15,7 @@ import org.apache.hadoop.io.Writable;
  * This class stores the (potentially partial) result
  * of a holistic computation (like median). 
  */
-public class HolisticResultShort implements Writable { 
+public class HolisticResultShort implements Writable,ShortTypedResult { 
   private short[] _values = null; // the values needed to apply the holisitic function
   private int _currentCount = 0; // how many values are currently set
   private boolean _full = false;
@@ -33,6 +34,27 @@ public class HolisticResultShort implements Writable {
 
   @SuppressWarnings("unused")
 private static final Log LOG = LogFactory.getLog(HolisticResultShort.class);
+
+  /*
+  public Class getWrappedValueClass() {
+    Class retType = null;
+    Class<?> arrayClass = _values.getClass();
+    Field[] flds = arrayClass.getDeclaredFields();
+    for (Field f : flds) {
+      Class<?> c = f.getType();
+      if (c.isArray()) {
+        System.out.format("%s%n"
+          + "           Field: %s%n"
+          + "            Type: %s%n"
+          + "  Component Type: %s%n",
+          f, f.getName(), c, c.getComponentType());
+        retType = c.getComponentType();
+      }
+    }
+
+    return retType;
+  }
+  */
 
   /** 
    * Constructor used to do fast creation
@@ -297,7 +319,7 @@ private static final Log LOG = LogFactory.getLog(HolisticResultShort.class);
     if( isFinal() ) {
       out.writeInt(1); // length
       out.writeInt(1); // count
-      out.writeInt(this._values[0]); // the final result
+      out.writeShort(this._values[0]); // the final result
 
     } else {
       out.writeInt(this._values.length);

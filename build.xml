@@ -80,7 +80,7 @@
 
     <fileset id="files.to.exclude" dir="${src.dir}" >
       <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFFileInputFormat.java" unless="build.netcdf" /> 
-      <include name="edu/ucsc/srl/damasc/hadoop/io/output/NetCDFFileOutputFormat.java" unless="build.netcdf" />
+      <!-- <include name="edu/ucsc/srl/damasc/hadoop/io/output/NetCDFFileOutputFormat.java" unless="build.netcdf" /> -->
       <include name="edu/ucsc/srl/damasc/hadoop/io/input/NetCDFRecordReader.java" unless="build.netcdf" />
       <include name="edu/ucsc/srl/damasc/hadoop/io/NetCDFTools.java" unless="build.netcdf" /> 
       <include name="edu/ucsc/srl/damasc/hadoop/tools/netcdf/**" unless="build.netcdf" />

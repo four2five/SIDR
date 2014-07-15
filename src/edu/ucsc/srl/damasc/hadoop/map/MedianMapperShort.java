@@ -88,22 +88,51 @@ private static final Log LOG = LogFactory.getLog(MedianMapperShort.class);
         while( dataItr.groupHasMoreValues() ) { 
           tempVal = dataItr.getNextValueShort();
           //result.setValue(dataItr.getNextValueShort());
+
+          /*
           if (Arrays.equals(tempGroup, testGroup)) { 
             LOG.info("  v: " + tempVal);
           }
+          */
           result.setValue(tempVal);
           totalElements++;
           perGroupCount++;
+          /*
+          if (Arrays.equals(tempGroup, testGroup)) { 
+            LOG.info("\tfirst: " + result.getValue(0));
+            LOG.info("\tmedian: " + result.getValue(result.getCurrentCount()/2));
+            LOG.info("\tlast: " + result.getValue(result.getCurrentCount()-1));
+          }
+          */
+
+        }
+        if (Arrays.equals(tempGroup, testGroup)) { 
+          //LOG.info("\tgroup count: " + perGroupCount);
         }
 
         if( result.isFull() ) {
           result.sort();
           medianValue = result.getValue(result.getCurrentCount()/2);
           result.setFinal(medianValue);
+          if (Arrays.equals(tempGroup, testGroup)) { 
+            //LOG.info("\tresult is final, result: " + medianValue);
+          }
+        } else {
+          if (Arrays.equals(tempGroup, testGroup)) { 
+            //LOG.info("\tresult is NOT final");
+          }
         }
 
         arraySpec.setVariable(key.getVarName());
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
+        if (Arrays.equals(tempGroup, testGroup)) { 
+          /*
+          LOG.info("\twriting out: " + 
+                   "\t\tarraySpec: " + arraySpec + "\n" + 
+                   "\t\tresult" + result + "\n" + 
+                   "\t\tperGroupCount: " + perGroupCount);
+          */
+        }
         context.write(arraySpec, result, perGroupCount);
       }
 

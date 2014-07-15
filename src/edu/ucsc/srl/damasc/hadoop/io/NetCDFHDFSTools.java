@@ -131,7 +131,7 @@ public class NetCDFHDFSTools{
 
       raf = getRAF( conf, inputFilePath);
       if( null == raf) { 
-        System.out.println("In getVariableShape . raf is NULL");
+        System.err.println("In getVariableShape . raf is NULL");
         return null;
       }
 
@@ -167,15 +167,23 @@ public class NetCDFHDFSTools{
       }
     }
 
+    if (null == ourVar) { 
+      System.err.println("about to return NULL from getVariable");
+    }
     return ourVar;
   }
 
   public static int getDataTypeSize(String inputFilePath,
                                     String variableName, Configuration conf) {
     int dataTypeSize = -1;
-    DataType dataType = getDataType(inputFilePath, variableName, conf);
-    dataTypeSize = dataType.getSize(); // size, in bytes
-    return dataTypeSize;
+    Variable var = getVariable(inputFilePath, variableName, conf);
+    return getDataTypeSize(var);
+  }
+
+  public static int getDataTypeSize(Variable var) 
+  {
+    DataType dataType = getDataType(var);
+    return dataType.getSize(); // size, in bytes
   }
 
   public static DataType getDataType(String inputFilePath,
@@ -183,12 +191,18 @@ public class NetCDFHDFSTools{
 
 
 	  Variable ourVar = getVariable(inputFilePath, variableName, conf);
+    return getDataType(ourVar);
+  }
+
+  public static DataType getDataType(Variable var) 
+  {
 	  DataType dataType = null;
 
 	  // if this is true, our variable is not in this file. Bail.
-	  if( null == ourVar ) {
+	  if( null == var) {
+      System.err.println("the variable passed in is NULL.");
 	  } else { 
-      dataType = ourVar.getDataType();
+      dataType = var.getDataType();
 	  }
 
     return dataType;

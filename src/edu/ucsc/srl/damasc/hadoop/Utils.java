@@ -23,6 +23,10 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
+import edu.ucsc.srl.damasc.hadoop.io.DoubleTypedResult;
+import edu.ucsc.srl.damasc.hadoop.io.FloatTypedResult;
+import edu.ucsc.srl.damasc.hadoop.io.IntTypedResult;
+import edu.ucsc.srl.damasc.hadoop.io.ShortTypedResult;
 import edu.ucsc.srl.damasc.hadoop.io.input.ArrayBasedFileSplit;
 import edu.ucsc.srl.damasc.hadoop.Utils.FSType;
 
@@ -1644,14 +1648,46 @@ public class Utils {
     return filePath;
   }
 
+  /**
+   * Called from FileOutputFormat, sort out how many bytes the output class
+   * will need.
+  */
   public static int getDataTypeSize(Class<?> inputClass) { 
     int retVal = 1; // default to 1 byte
 
-    if (inputClass.getSimpleName().equals("IntWritable")){ 
+    System.out.println("getDataTypeSize, input class: " + inputClass.getSimpleName());
+
+    if (DoubleTypedResult.class.isAssignableFrom(inputClass)) { 
+      System.out.println("\t8 bytes");
+      retVal = 8;
+    } else if (IntTypedResult.class.isAssignableFrom(inputClass)) { 
+      System.out.println("\t4 bytes");
+      retVal = 4;
+    } else if (ShortTypedResult.class.isAssignableFrom(inputClass)) { 
+      System.out.println("\t2 bytes");
+      retVal = 2;
+    } else if (FloatTypedResult.class.isAssignableFrom(inputClass)) { 
+      System.out.println("\t4 bytes");
+      retVal = 4;
+    } else { 
+      System.err.println("Could not determine the size in Utils.getDataTypeSize()");
+    }
+
+    /*
+    if (inputClass.getSimpleName().equals("ShortWritable")){ 
+      retVal = 2;
+    } else if (inputClass.getSimpleName().equals("IntWritable")){ 
       retVal = 4;
     } else if (inputClass.getSimpleName().equals("LongWritable")){ 
       retVal = 8;
+    } else if (inputClass.getSimpleName().equals("HolisticResultShort")){ 
+      retVal = 2;
+    } else if (inputClass.getSimpleName().equals("HolisticResultInt")){ 
+      retVal = 4;
+    } else if (inputClass.getSimpleName().equals("HolisticResultLong")){ 
+      retVal = 8;
     }
+    */
 
     return retVal;
   }
@@ -1672,5 +1708,29 @@ public class Utils {
     original.rewind();
     clone.flip();
     return clone;
+  }
+
+  public static Class determineWrappedClass(Class<?> clazz) { 
+    Class retClass = null;
+    if (null == clazz) {
+      LOG.info("in determineWrappedValueClass() and clazzis null");
+    } else {
+      LOG.info("in determineWrappedValueClass(), arrayClass is: " + clazz.toString());
+    }
+
+    if (clazz== double[].class) {
+      LOG.info("This is a double[]");
+      retClass = double.class;
+    } else if (clazz== short[].class) {
+      LOG.info("This is a double[]");
+      retClass = short.class;
+    } else if (clazz == int[].class) {
+      LOG.info("This is a int[]");
+      retClass = int.class;
+    } else {
+      LOG.info("This is an array of unknown type");
+    }
+
+    return retClass;
   }
 }
