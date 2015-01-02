@@ -89,9 +89,14 @@ public class AverageReducerFloat extends
     AverageResultFloat aRes = new AverageResultFloat();
 
     for (AverageResultFloat value : values) {
+      System.out.println("in AvgRedFl, Merging in value: " + value.getCurrentValueFloat() + " count: " + value.getCurrentCount());
+      System.out.println("\tcurrent value: " + aRes.getCurrentValueFloat() + " count: " + aRes.getCurrentCount());
       aRes.addAverageResultFloat(value);
+      System.out.println("\t\tpost merge value: " + aRes.getCurrentValueFloat() + " count: " + aRes.getCurrentCount());
     }
 
+    System.out.println("context.write() key: " + key + " value: " + aRes.getCurrentValueFloat() +
+                       " count: " + aRes.getCurrentCount());
     context.write(key, aRes, aRes.getCurrentCount()); 
 
     timer = System.currentTimeMillis() - timer;

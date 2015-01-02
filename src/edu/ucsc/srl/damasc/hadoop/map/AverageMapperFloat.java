@@ -78,30 +78,42 @@ private static final Log LOG = LogFactory.getLog(AverageMapperFloat.class);
       int[] tempArray = new int[extractionShape.length];
       long totalElements = 0;
       long totalGroups = 0;
-      long perGroupTotal = 0;
+      //long perGroupTotal = 0;
+      float runningPerGroupTotal = 0.0f;
       int perGroupCount = 0;
 
       while( dataItr.hasMoreGroups() ) { 
         tempGroup = dataItr.getNextGroup();
-        perGroupTotal = 0;
+        //perGroupTotal = 0;
+	runningPerGroupTotal = 0.0f;
         perGroupCount = 0;
-        
-
 
         while( dataItr.groupHasMoreValues() ) { 
-          perGroupTotal += dataItr.getNextValueFloat();
-          perGroupCount++;
+          perGroupCount++; // we increment first so that the next line never divides by zero
 
-          totalElements++;
+          // We compute the running average by added the diffence between the current value and the total,
+          // dividing the different by the number of samples so that it has the appropriate affect on the average
+          //runningPerGroupTotal += (dataItr.getNextValueFloat() - runningPerGroupTotal) / perGroupCount;
+          
+          // use the Class' logic for buffering floats
+          aRes.addValue(dataItr.getNextValueFloat());
         }
 
-        aRes.setValue((float)perGroupTotal/perGroupCount, perGroupCount);
+        //aRes.setValue((float)perGroupTotal/perGroupCount, perGroupCount);
+        //aRes.setValue(runningPerGroupTotal, perGroupCount);
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
-
+      
+        totalElements += perGroupCount;
         totalGroups++;
 
         arraySpec.setVariable(key.getVarName());
         context.write(arraySpec, aRes, perGroupCount);
+        System.out.println("Group: " + arraySpec + " had " + perGroupCount +
+                           " elements in this input split. Value: " + runningPerGroupTotal);
+        System.out.println("ares value: " + aRes.getCurrentValueFloat() + " count: " + aRes.getCurrentCount());
+
+        // reset the accumulator object
+        aRes.clear();
       }
 
       timer = System.currentTimeMillis() - timer;

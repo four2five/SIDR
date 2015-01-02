@@ -165,7 +165,7 @@ public class HadoopUtils {
         dimString = dimString.replaceAll("\\s+", "");
       }
 
-      System.out.println("JB, here's that string" + dimString);
+      //System.out.println("JB, here's that string" + dimString);
       String[] dimStrings = dimString.split(",");
       variableShape = new int[dimStrings.length];
 
@@ -1335,7 +1335,7 @@ public class HadoopUtils {
       returnShape[recordDim] = totalOutputSpace[recordDim] - returnCorner[recordDim];
     }
 
-    LOG.info("JB, debug print3: " + Arrays.toString(returnShape));
+    //LOG.info("JB, debug print3: " + Arrays.toString(returnShape));
     // round the shape
     returnShape = roundArrayShape(returnShape, totalOutputSpace);
 
@@ -1530,4 +1530,31 @@ public class HadoopUtils {
     
     return result;
   }
+
+  // test whether these values can be safely added
+  public static final boolean safeAdd(int left, int right)
+  {
+    if (right > 0 ? left > Integer.MAX_VALUE - right
+                  : left < Integer.MIN_VALUE - right) {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
+  // test whether these values can be safely added
+  public static final boolean safeAdd(float left, float right)
+  {
+    if (right > 0 ? left > Float.MAX_VALUE - right
+                  : left < Float.MIN_VALUE - right) {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
 
+import edu.ucsc.srl.damasc.hadoop.HadoopUtils;
+
 import org.apache.hadoop.io.Writable;
 
 /**
@@ -12,6 +14,9 @@ import org.apache.hadoop.io.Writable;
  * for accurrate aggregation of partial results into the final result.
  */
 public class AverageResultFloat implements Writable { 
+  //private float _bufferedValues; // use this to buffer floats until we need to average them
+  private double _bufferedValues; // use this to buffer floats until we need to average them
+  private int _bufferedCount; // count of how many values are buffered
   private float _currentValue;
   private int _valuesCombinedCount;
 
@@ -32,8 +37,8 @@ public class AverageResultFloat implements Writable {
    * object
    */
   public AverageResultFloat(float value) throws Exception {
-    this._currentValue = value;
-    this._valuesCombinedCount = 1;
+    this.clear();
+    addValue(value);
   }
 
   /**
@@ -52,8 +57,39 @@ public class AverageResultFloat implements Writable {
    * Re-initialize this object for potential reuse
    */
   public void clear() {
-    this._currentValue = (float)0;
+    this._currentValue = 0.0f;
     this._valuesCombinedCount = 0;
+    this._bufferedValues = 0.0;
+    this._bufferedCount = 0;
+  }
+
+  // This call combines the buffered values into the actual value
+  private void foldInBufferedValues() 
+  {
+    // compute the buffered average, if there are any buffered values
+    if (_bufferedCount == 0)
+    {
+      return;
+    }
+    else
+    {
+      float bufferedAverage = (float)(_bufferedValues /  _bufferedCount);
+      double ratio = (float)_bufferedCount / (_valuesCombinedCount + _bufferedCount); 
+
+      System.out.println("fold, vcc: " + _valuesCombinedCount + " bc: " + _bufferedCount);
+      System.out.println("fold, ba: " + bufferedAverage + " ratio: " + ratio + 
+                         " cv: " + _currentValue);
+      //  now adjust the current value by the weighted difference
+      _currentValue -= (float)((this._currentValue - bufferedAverage) * ratio);
+      _valuesCombinedCount += _bufferedCount;
+
+      System.out.println("\tcv: " + _currentValue + " _vcc: " + _valuesCombinedCount);
+
+      // reset the buffered values / count
+      _bufferedCount = 0;
+      _bufferedValues = 0;
+    }
+
   }
 
   /**
@@ -62,6 +98,8 @@ public class AverageResultFloat implements Writable {
    * @return the current average value
    */
   public float getCurrentValue() {
+    // remember to fold in the buffered values
+    foldInBufferedValues();
     return this._currentValue;
   }
 
@@ -70,7 +108,7 @@ public class AverageResultFloat implements Writable {
    * @return the current average value as a float
    */
   public float getCurrentValueFloat() {
-    return this._currentValue;
+    return getCurrentValue();
   }
 
   /**
@@ -91,13 +129,28 @@ public class AverageResultFloat implements Writable {
   public void addValue(float value) throws IOException {
     // Need to be careful so that we do not overflow
     float delta = _currentValue - value;
-    // now weight it by current count + 1
-    delta = delta / (_valuesCombinedCount + 1);
-    _currentValue -= delta;  // subract the weighted delta from the running average
     _valuesCombinedCount++;
+    // now weight it by current count + 1
+    delta = delta / _valuesCombinedCount;
+    _currentValue -= delta;  // subract the weighted delta from the running average
 
-    //old, dead code left for reference
-    //this._currentValue = ((this._currentValue * this._valuesCombinedCount) + value ) / (this._valuesCombinedCount + 1);
+    /*
+    // buffer this, if possible
+    if (HadoopUtils.safeAdd((float)_bufferedValues, value))
+    {
+      _bufferedValues += value;
+      _bufferedCount++;
+    }
+    else
+    {
+      // if the new value won't safely fit, fold in the current buffer 
+      // and then buffer it
+      foldInBufferedValues();
+      _bufferedValues += value;
+      _bufferedCount++;
+    }
+    */
+
   }
 
   /**
@@ -105,11 +158,28 @@ public class AverageResultFloat implements Writable {
    * @param result the AverageResultFloat object to merge with this one
    */
   public void addAverageResultFloat( AverageResultFloat result ) { 
-    this._currentValue =  ((this._currentValue * this._valuesCombinedCount) + 
-                          (result.getCurrentValueFloat() * result.getCurrentCount())) 
-                         / ((float)this._valuesCombinedCount + result.getCurrentCount());
-    this._valuesCombinedCount += result.getCurrentCount();
 
+    System.out.println("in aresfloat, merging in count: " + result.getCurrentCount() +
+                       " to existing count: " + this._valuesCombinedCount);
+
+    // If this object has no values, then use the result object's values
+    if (this._valuesCombinedCount == 0)
+    {
+      this._valuesCombinedCount = result.getCurrentCount();
+      this._currentValue = result.getCurrentValueFloat();
+    }
+    else if (result.getCurrentCount() == 0)
+    {
+      // no-op since we just use the current values, ignoring the empty result object
+    }
+    else // actually need to do some math
+    {
+      // Compute how much the result argument should affect the current value
+      float ratio = result.getCurrentCount() / (this._valuesCombinedCount + result.getCurrentCount()); 
+      //  now adjust the current value by the weighted difference
+      this._currentValue -= (this._currentValue - result.getCurrentValueFloat()) * ratio;	
+      this._valuesCombinedCount += result.getCurrentCount();
+    }
   }
 
   /**
@@ -157,8 +227,10 @@ public class AverageResultFloat implements Writable {
    */
   @Override
   public void write(DataOutput out) throws IOException {
+    // make sure that we fold in the buffered values prior to writing this out
+    foldInBufferedValues();
     out.writeFloat(this._currentValue);
-    out.writeFloat(this._valuesCombinedCount);
+    out.writeInt(this._valuesCombinedCount);
   }
 
   /**
@@ -168,7 +240,6 @@ public class AverageResultFloat implements Writable {
    */
   @Override
   public void readFields(DataInput in) throws IOException {
-
     this.setCurrentValue(in.readFloat());
     this.setValuesCombinedCount(in.readInt());
   }

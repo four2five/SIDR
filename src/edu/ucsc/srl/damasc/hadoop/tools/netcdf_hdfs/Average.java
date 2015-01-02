@@ -175,8 +175,9 @@ public class Average extends Configured implements Tool {
     String partitionerType = job.getPartitionerClass().getCanonicalName();
     System.out.println("Partitioner: " + partitionerType);
 
-		if ( Utils.useCombiner(conf) ) {
-			jobNameString += " with combiner ";
+    if ( Utils.useCombiner(conf) ) {
+      jobNameString += " with combiner ";
+
       if (DataType.INT == dataType) { 
 			  job.setCombinerClass(AverageReducerInt.class);
       } else if (DataType.SHORT == dataType) { 
@@ -188,7 +189,7 @@ public class Average extends Configured implements Tool {
       } else { 
         System.out.println("!!!! ERROR: a combiner was specified but one is not available for this data type");
       }
-		}
+    }
 
     if( Utils.noScanEnabled(conf) ) 
       jobNameString += " with noscan ";
