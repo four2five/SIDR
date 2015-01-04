@@ -360,6 +360,28 @@ public class NetcdfFileGenerator {
                                      " origin: " + arrayToString(origin.getCurrentCounter()) + 
                                      " writeSize: " + array.getSize() + 
                                      " write shape: " + arrayToString(singleStep) );
+                } else if (DataType.FLOAT == dataType) { 
+                  array = new ArrayFloat(singleStep);
+                  IndexIterator iter = array.getIndexIterator();
+
+                  while( iter.hasNext() ) {
+                      iter.getShortNext();
+                      // uncomment the following line for a random distribution
+                      //iter.setIntCurrent((int)  (Math.abs(generator.nextGaussian()) * 40) );
+                      // uncomment this line for an incrementing value
+                      iter.setFloatCurrent((float)valueCounter);
+                      valueCounter++;
+
+                      // book keeping
+                      writtenSoFar++;
+                      //origin.incr();
+                  }
+
+                  System.out.println("Writing to file: " + ncFile.getLocation() + 
+                                     ". var_name: " + varName  + 
+                                     " origin: " + arrayToString(origin.getCurrentCounter()) + 
+                                     " writeSize: " + array.getSize() + 
+                                     " write shape: " + arrayToString(singleStep) );
                 }
 
                 if (null == varName) 
@@ -534,16 +556,16 @@ public class NetcdfFileGenerator {
         ArrayList<VariableEntry> variableList = new ArrayList<VariableEntry>();
 
         //variableList.add(new VariableEntry("time", 14600, DataType.INT, true, 
-        variableList.add(new VariableEntry("time", 80, DataType.INT, true, 
+        variableList.add(new VariableEntry("time", 20, DataType.INT, true, 
                          "days", "time since midnight, 1,1,1970") );
         //variableList.add(new VariableEntry("lat2", 180, DataType.FLOAT, false, 
-        variableList.add(new VariableEntry("lat2", 180, DataType.FLOAT, false, 
+        variableList.add(new VariableEntry("lat2", 880, DataType.INT, false, 
                          "latitude", "half_degrees_from_north" ) );
-        variableList.add(new VariableEntry("lon2", 360, DataType.FLOAT, false, 
+        variableList.add(new VariableEntry("lon2", 1760, DataType.INT, false, 
                          "longitude", "quarter_degrees_going_east" ) );
         //variableList.add(new VariableEntry("elev2", 35, DataType.FLOAT, false, 
-        variableList.add(new VariableEntry("elev2", 50, DataType.FLOAT, false, 
-                         "elevation", "meters") );
+        //variableList.add(new VariableEntry("elev2", 50, DataType.FLOAT, false, 
+         //                "elevation", "meters") );
 
         return variableList;
     }
