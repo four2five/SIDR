@@ -74,7 +74,11 @@
                 <path id="application" location="${jar.dir}/${ant.project.name}.jar"/>
             </classpath>
             <arg value="-f"/>
-            <arg value="${file.to.read}"/>
+            <arg value="${file}"/>
+            <arg value="-v"/>
+            <arg value="${variable}"/>
+            <arg value="-t"/>
+            <arg value="${time}"/>
         </java>
     </target>
 

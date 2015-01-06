@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -19,15 +20,15 @@ public class ReadFile
   }
 
   
-  private static final String variableName = "windspeed2";
+  //private static final String variableName = "windspeed2";
 
-  public ArrayFloat readFile(String filePath)
+  public ArrayFloat readFile(String filePath, String variableName, int timestep)
   {
     NetcdfFile ncfile = null;
     log.log(Level.INFO, "Reading file: " + filePath);
     try {
       ncfile = NetcdfFile.open(filePath);
-      ArrayFloat data = loadFirstTimeStep( ncfile, variableName);
+      ArrayFloat data = loadTimeStep(ncfile, variableName, timestep);
       return data;
     } catch (IOException ioe) {
       log.log(Level.SEVERE, "trying to open " + filePath + " caught ioe: " + ioe);
@@ -42,7 +43,7 @@ public class ReadFile
     return null;
   }
 
-  public ArrayFloat loadFirstTimeStep(NetcdfFile ncfile, String variableName)
+  public ArrayFloat loadTimeStep(NetcdfFile ncfile, String variableName, int timestep)
   {
     // pull out the variable "windspeed2"
     Variable dataVar = ncfile.findVariable(variableName);
@@ -57,7 +58,7 @@ public class ReadFile
 
     log.log(Level.INFO, "Variable: " + variableName + " has " + dataVar.getSize() + " elements");
 
-    // set the first dimension to 1
+    // set the first dimension to be one so that one full record is read
     shape[0] = 1;
   
     // setup the origin variable
@@ -67,6 +68,11 @@ public class ReadFile
     {
       origin[i] = 0;
     } 
+
+    // set the read origin to the passed in timestep
+    origin[0] = timestep;
+
+    log.log(Level.INFO, "Reading " + Arrays.toString(origin) + " : " + Arrays.toString(shape));
 
     ArrayFloat dataArray = null;
     try
