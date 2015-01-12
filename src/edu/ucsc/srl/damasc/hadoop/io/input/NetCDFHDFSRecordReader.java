@@ -115,17 +115,24 @@ public class NetCDFHDFSRecordReader
 
     // cached coordinate var data file path
     String cachedFileName = conf.get(Utils.CACHED_COORD_FILE_NAME);
-    LOG.info("Pulling coord vars from file " + cachedFileName);
+    if (cachedFileName == null) 
+    {
+      LOG.info("No coordinate data to load");
+    }
+    else
+    {
+      LOG.info("Pulling coord vars from file " + cachedFileName);
 
-    // use a helper function to return a list of CoordinateVariable objects
-    HashMap<String, CoordVariable> coordVars = 
-        NetCDFHDFSTools.loadCoordVarsFromDCache(cachedFileName, conf);
+      // use a helper function to return a list of CoordinateVariable objects
+      HashMap<String, CoordVariable> coordVars = 
+          NetCDFHDFSTools.loadCoordVarsFromDCache(cachedFileName, conf);
   
-    // load coordinate variables into the MVD structure 
-    if (coordVars != null) { 
-      for (String coordVarName : coordVars.keySet())  { 
-        this._data.putVarDataByName(coordVarName, ByteBuffer.wrap(coordVars.get(coordVarName).getData()));
-      }   
+      // load coordinate variables into the MVD structure 
+      if (coordVars != null) { 
+        for (String coordVarName : coordVars.keySet())  { 
+          this._data.putVarDataByName(coordVarName, ByteBuffer.wrap(coordVars.get(coordVarName).getData()));
+        }   
+      }
     }
   }
 

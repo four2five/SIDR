@@ -62,7 +62,9 @@ public class GenerateMainTool {
         "     pgd.addClass(\"netcdf_hdfs_median\", \n" + 
         "       edu.ucsc.srl.damasc.hadoop.tools.netcdf_hdfs.Median.class, \"NetCDF HDFS median job\"); \n" + 
         "     pgd.addClass(\"netcdf_hdfs_average\", \n" + 
-        "       edu.ucsc.srl.damasc.hadoop.tools.netcdf_hdfs.Average.class, \"NetCDF HDFS average job\"); \n" + 
+        "       edu.ucsc.srl.damasc.hadoop.tools.netcdf_hdfs.Average.class, \"NetCDF HDFS average job\"); \n" +
+        "     pgd.addClass(\"netcdf_hdfs_weighted_average\", \n" + 
+        "       edu.ucsc.srl.damasc.hadoop.tools.netcdf_hdfs.WeightedAverage.class, \"NetCDF HDFS weighted average job\"); \n" + 
         //"     pgd.addClass(\"netcdf_hdfs_filter\", \n" + 
         //"       edu.ucsc.srl.damasc.hadoop.tools.netcdf_hdfs.Filter.class, \"NetCDF HDFS filter job\"); \n" + 
         //"     pgd.addClass(\"netcdf_hdfs_coordvar_filter\", \n" + 

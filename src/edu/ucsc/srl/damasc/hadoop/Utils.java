@@ -42,6 +42,7 @@ public class Utils {
     public static final String REDUCER_SHAPE_WEIGHT = "damasc.reducer_shape_weight";
     public static final String CEPH_DEFAULT_URI = "damasc.ceph_uri";
     public static final String VARIABLE_NAME = "damasc.variable_name";
+    public static final String WEIGHTS_FILE = "damasc.weights_file";
     public static final String DATATYPE_SIZE = "damasc.datatype_size";
     public static final String COORDINATE_VARIABLE_NAME = "damasc.coordinate_variable_name";
     public static final String VARIABLES_TO_PERSIST = "damasc.variables_to_persist";
@@ -205,7 +206,10 @@ public class Utils {
       variableShapeSet = true;
 
       return variableShape;
-    }
+    } 
+
+    
+
     /**
      * Indicates if the Variable Shape has already been set for the current job
      * @return boolean true if the variable shape has been set, false otherwise
@@ -221,6 +225,11 @@ public class Utils {
      */
     public static String getVariableName(Configuration conf) {
       String varString = conf.get(VARIABLE_NAME, "");
+      return varString;
+    }
+
+    public static String getWeightsFileName(Configuration conf) {
+      String varString = conf.get(WEIGHTS_FILE, "");
       return varString;
     }
 
