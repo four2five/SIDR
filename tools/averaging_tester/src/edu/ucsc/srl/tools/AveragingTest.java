@@ -77,10 +77,20 @@ public class AveragingTest
         float result = sa.sumFloatValues(data); 
         log.log(Level.INFO, "sumall result: " + result);
 
+        // apply the SumAllDouble approach
+        SumAllDouble sad = new SumAllDouble();
+        result = sad.sumFloatValues(data); 
+        log.log(Level.INFO, "sumallDouble result: " + result);
+
         // apply the Rolling average approach
         RollingAverage ra = new RollingAverage();
         result = ra.averageFloatValues(data);
         log.log(Level.INFO, "rollingaverage result: " + result);
+
+        // apply the Rolling average double approach
+        RollingAverageDouble rad = new RollingAverageDouble();
+        result = rad.averageFloatValues(data);
+        log.log(Level.INFO, "rollingaverageDouble result: " + result);
       }
       else
       {

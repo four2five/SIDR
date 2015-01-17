@@ -17,7 +17,7 @@ public class AverageResultFloat implements Writable {
   //private float _bufferedValues; // use this to buffer floats until we need to average them
   private double _bufferedValues; // use this to buffer floats until we need to average them
   private int _bufferedCount; // count of how many values are buffered
-  private float _currentValue;
+  private double _currentValue;
   private int _valuesCombinedCount;
 
   //private static final Log LOG = LogFactory.getLog(AverageResultFloat.class);
@@ -57,7 +57,7 @@ public class AverageResultFloat implements Writable {
    * Re-initialize this object for potential reuse
    */
   public void clear() {
-    this._currentValue = 0.0f;
+    this._currentValue = 0.0;
     this._valuesCombinedCount = 0;
     this._bufferedValues = 0.0;
     this._bufferedCount = 0;
@@ -100,7 +100,7 @@ public class AverageResultFloat implements Writable {
   public float getCurrentValue() {
     // remember to fold in the buffered values
     foldInBufferedValues();
-    return this._currentValue;
+    return (float)this._currentValue;
   }
 
   /**
@@ -128,7 +128,7 @@ public class AverageResultFloat implements Writable {
    */
   public void addValue(float value) throws IOException {
     // Need to be careful so that we do not overflow
-    float delta = _currentValue - value;
+    double delta = _currentValue - value;
     _valuesCombinedCount++;
     // now weight it by current count + 1
     delta = delta / _valuesCombinedCount;
@@ -229,7 +229,7 @@ public class AverageResultFloat implements Writable {
   public void write(DataOutput out) throws IOException {
     // make sure that we fold in the buffered values prior to writing this out
     foldInBufferedValues();
-    out.writeFloat(this._currentValue);
+    out.writeDouble(this._currentValue);
     out.writeInt(this._valuesCombinedCount);
   }
 
@@ -240,7 +240,7 @@ public class AverageResultFloat implements Writable {
    */
   @Override
   public void readFields(DataInput in) throws IOException {
-    this.setCurrentValue(in.readFloat());
+    this.setCurrentValue(in.readDouble());
     this.setValuesCombinedCount(in.readInt());
   }
 }
