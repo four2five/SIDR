@@ -367,7 +367,6 @@ public class NetCDFHDFSTools{
   }
 
   public static HashMap<String, CoordVariable> loadCoordVarsFromDCache(
-                                                                    String fileName, 
                                                                     Configuration conf) { 
 
     HashMap<String, CoordVariable> retVal = null; 

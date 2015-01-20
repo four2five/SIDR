@@ -186,7 +186,11 @@ public class AverageResultFloat implements Writable {
    * Set the current value from a float
    * @param value the float value to use to set the current value
    */
-  protected void setCurrentValue( float value) {
+  protected void setCurrentValue( float value ) {
+    this._currentValue = value;
+  }
+
+  protected void setCurrentRawValue( double value ) {
     this._currentValue = value;
   }
 
@@ -240,7 +244,7 @@ public class AverageResultFloat implements Writable {
    */
   @Override
   public void readFields(DataInput in) throws IOException {
-    this.setCurrentValue(in.readDouble());
+    this.setCurrentRawValue(in.readDouble());
     this.setValuesCombinedCount(in.readInt());
   }
 }
