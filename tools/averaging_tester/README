@@ -1,0 +1,2 @@
+To run the tool, you need to specify the file to read, the variable name and the timestep. Example:
+ant run -Dfile=float_test_data.nc -Dvariable=windspeed4 -Dtime=1
