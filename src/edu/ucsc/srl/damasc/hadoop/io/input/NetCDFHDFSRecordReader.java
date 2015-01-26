@@ -125,7 +125,7 @@ public class NetCDFHDFSRecordReader
 
       // use a helper function to return a list of CoordinateVariable objects
       HashMap<String, CoordVariable> coordVars = 
-          NetCDFHDFSTools.loadCoordVarsFromDCache(cachedFileName, conf);
+          NetCDFHDFSTools.loadCoordVarsFromDCache(conf);
   
       // load coordinate variables into the MVD structure 
       if (coordVars != null) { 

@@ -25,6 +25,7 @@
     <pathelement location="${env.NETCDF_HOME}/lib/external/slf4j-api-1.6.4.jar"/> 
     <!-- <pathelement location="${env.HADOOP_HOME}/share/hadoop/common/lib/commons-cli-1.2.jar"/>  -->
     <pathelement location="${env.HADOOP_HOME}/build/hadoop-1.0.4-early-results/share/hadoop/lib/commons-cli-1.2.jar"/>
+    <pathelement location="${env.SCIHADOOP_HOME}/build/jar/${env.SCIHADOOP_JAR}"/> 
   </path>
 
   <target name="init">
@@ -80,6 +81,8 @@
             <arg value="${variable}"/>
             <arg value="-t"/>
             <arg value="${time}"/>
+            <arg value="-w"/>
+            <arg value="${weightsFile}"/>
         </java>
     </target>
 

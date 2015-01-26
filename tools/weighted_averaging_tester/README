@@ -1,0 +1,2 @@
+To run the tool, you need to specify the file to read, the variable name and the timestep. Example:
+ant run -Dfile=tmp2m.cdas1.201301.grb2.nc -Dvariable=TMP_L103 -Dtime=82 -DweightsFile=weights.txt

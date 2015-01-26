@@ -102,7 +102,7 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
       while( dataItr.hasMoreGroups() ) { 
         tempGroup = dataItr.getNextGroup();
         //perGroupTotal = 0;
-	runningPerGroupTotal = 0.0f;
+	      runningPerGroupTotal = 0.0f;
         perGroupCount = 0;
 
         while( dataItr.groupHasMoreValues() ) { 
@@ -123,7 +123,8 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
         context.write(arraySpec, aRes, perGroupCount);
         System.out.println("Group: " + arraySpec + " had " + perGroupCount +
                            " elements in this input split. Value: " + runningPerGroupTotal);
-        System.out.println("ares value: " + aRes.getCurrentValueFloat() + " count: " + aRes.getCurrentCount());
+        System.out.println("ares value: " + aRes.getCurrentValueFloat() +
+			   " count: " + aRes.getCurrentCount());
 
         // reset the accumulator object
         aRes.clear();
