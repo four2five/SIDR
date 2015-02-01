@@ -59,7 +59,7 @@ public class WeightedSumAllDouble
     assert(numGroups == 1);
 
     //float finalResult = (float) (accumulator / count);
-    System.out.println("nlon: " + shape[2]);
+    System.out.println("accum: " + accumulator + "nlon: " + shape[2]);
     float finalResult = (float) (accumulator / (2.0f * shape[2]));
     return finalResult;
   }

@@ -15,8 +15,9 @@ import org.apache.hadoop.util.ToolRunner;
 
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.Utils.PartitionerClass;
+import edu.ucsc.srl.damasc.hadoop.combine.WeightedAverageCombinerFloat;
 import edu.ucsc.srl.damasc.hadoop.io.AverageResultDouble;
-import edu.ucsc.srl.damasc.hadoop.io.AverageResultFloat;
+import edu.ucsc.srl.damasc.hadoop.io.WeightedAverageResultFloat;
 import edu.ucsc.srl.damasc.hadoop.io.AverageResultInt;
 import edu.ucsc.srl.damasc.hadoop.io.AverageResultShort;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
@@ -32,6 +33,7 @@ import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerDouble;
 import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerFloat;
 import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerInt;
 import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerShort;
+import edu.ucsc.srl.damasc.hadoop.reduce.WeightedAverageReducerFloat;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
@@ -161,15 +163,15 @@ public class WeightedAverage extends Configured implements Tool {
       */
     if (DataType.FLOAT == dataType) { 
       job.setMapperClass(WeightedAverageMapperFloat.class);
-      job.setReducerClass(AverageReducerFloat.class);
+      job.setReducerClass(WeightedAverageReducerFloat.class);
 
       // mapper output
       job.setMapOutputKeyClass(ArraySpec.class);
-      job.setMapOutputValueClass(AverageResultFloat.class);
+      job.setMapOutputValueClass(WeightedAverageResultFloat.class);
 
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
-      job.setOutputValueClass(AverageResultFloat.class);
+      job.setOutputValueClass(WeightedAverageResultFloat.class);
     }
 	
 
@@ -202,7 +204,7 @@ public class WeightedAverage extends Configured implements Tool {
       } else if (DataType.DOUBLE == dataType) { 
         job.setCombinerClass(AverageReducerDouble.class);
       } else if (DataType.FLOAT == dataType) { 
-        job.setCombinerClass(AverageReducerFloat.class);
+        job.setCombinerClass(WeightedAverageCombinerFloat.class);
       } else { 
         System.out.println("!!!! ERROR: a combiner was specified but one is not available for this data type");
       }

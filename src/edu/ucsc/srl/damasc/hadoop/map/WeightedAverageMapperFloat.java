@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -16,7 +17,7 @@ import org.apache.hadoop.mapreduce.TaskID;
 import edu.ucsc.srl.damasc.hadoop.Utils;
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.DataIterator;
-import edu.ucsc.srl.damasc.hadoop.io.AverageResultFloat;
+import edu.ucsc.srl.damasc.hadoop.io.WeightedAverageResultFloat;
 import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
 
 /**
@@ -24,7 +25,7 @@ import edu.ucsc.srl.damasc.hadoop.io.MultiVarData;
  * This is used for testing purposes
  */
 public class WeightedAverageMapperFloat extends Mapper<ArraySpec, MultiVarData, 
-                                                       ArraySpec, AverageResultFloat> {
+                                                       ArraySpec, WeightedAverageResultFloat> {
 
 private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.class);
 
@@ -58,7 +59,7 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
 
       ArraySpec arraySpec = new ArraySpec(key.getCorner(), "");
       int extShapeSize = Utils.calcTotalSize(extractionShape);
-      AverageResultFloat aRes = new AverageResultFloat();
+      WeightedAverageResultFloat waRes = new WeightedAverageResultFloat();
 
     
       Configuration conf = context.getConfiguration();
@@ -73,6 +74,8 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
                          " extSize: " + extShapeSize + 
                          " datatypeSize: " + datatypeSize);
 
+      Path weightsFile = null;
+
       Path[] cachedFiles = DistributedCache.getLocalCacheFiles(conf);
 
       if (cachedFiles != null) 
@@ -81,11 +84,27 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
         for (Path cachedFile : cachedFiles)
         {
           System.out.println("\t" + cachedFile.toString());
+          weightsFile = cachedFile;
         }
       }
       else
       {
         System.out.println("cachedFiles is null");
+      }
+
+      float[] weights = null;
+
+      if (weightsFile != null)
+      {
+        // load the weights
+        weights = Utils.loadWeightsFile(weightsFile.toString(),extShapeSize);
+        System.out.println("first 3 elements are: ");
+        System.out.println(" " + weights[0] + " " + weights[1] + " " + weights[2]);
+      }
+      else
+      {
+        System.out.println("No weights file specified, existing");
+        System.exit(1);
       }
 
       DataIterator dataItr = new DataIterator(inArray, key.getCorner(),
@@ -108,26 +127,24 @@ private static final Log LOG = LogFactory.getLog(WeightedAverageMapperFloat.clas
         while( dataItr.groupHasMoreValues() ) { 
           perGroupCount++; // we increment first so that the next line never divides by zero
 
-          // use the Class' logic for buffering floats
-          aRes.addValue(dataItr.getNextValueFloat());
+          // use the Class' logic for buffering weighted floats
+          waRes.addValue(dataItr.getNextValueFloat() * weights[dataItr.getCurrentReadCoordinate()[1]]);
         }
 
-        //aRes.setValue((float)perGroupTotal/perGroupCount, perGroupCount);
-        //aRes.setValue(runningPerGroupTotal, perGroupCount);
         Utils.mapToLocal(tempGroup, tempArray, arraySpec, extractionShape);
       
         totalElements += perGroupCount;
         totalGroups++;
 
         arraySpec.setVariable(key.getVarName());
-        context.write(arraySpec, aRes, perGroupCount);
+        context.write(arraySpec, waRes, perGroupCount);
         System.out.println("Group: " + arraySpec + " had " + perGroupCount +
                            " elements in this input split. Value: " + runningPerGroupTotal);
-        System.out.println("ares value: " + aRes.getCurrentValueFloat() +
-			   " count: " + aRes.getCurrentCount());
+        System.out.println("ares value: " + waRes.getCurrentValueFloat() +
+			   " count: " + waRes.getCurrentCount());
 
         // reset the accumulator object
-        aRes.clear();
+        waRes.clear();
       }
 
       timer = System.currentTimeMillis() - timer;

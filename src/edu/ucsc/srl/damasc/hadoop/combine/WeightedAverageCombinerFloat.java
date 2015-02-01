@@ -1,4 +1,4 @@
-package edu.ucsc.srl.damasc.hadoop.reduce;
+package edu.ucsc.srl.damasc.hadoop.combine;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,12 +16,12 @@ import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.WeightedAverageResultFloat;
 
 /**
- * Reducer that simply iterates through the data it is passed
+ * Combiner that simply iterates through the data it is passed
  */
-public class WeightedAverageReducerFloat extends 
+public class WeightedAverageCombinerFloat extends 
         Reducer<ArraySpec, WeightedAverageResultFloat, ArraySpec, WeightedAverageResultFloat> {
 
-  private static final Log LOG = LogFactory.getLog(WeightedAverageReducerFloat.class);
+  private static final Log LOG = LogFactory.getLog(WeightedAverageCombinerFloat.class);
 
   private int[] _extractionShape;
   private long _extShapeSize;
@@ -33,7 +33,7 @@ public class WeightedAverageReducerFloat extends
     TaskID task = attempt.getTaskID();
     Configuration conf = context.getConfiguration();
 
-    LOG.info("in reduce().setup for task: " + task.getId());
+    LOG.info("in combiner().setup for task: " + task.getId());
      
     int[] outputCornerForThisReducer = 
       HadoopUtils.getOutputCornerForReducerN(task.getId(), conf );
@@ -57,7 +57,7 @@ public class WeightedAverageReducerFloat extends
       HadoopUtils.getExtractionShape(conf, outputCornerForThisReducer.length);
 
     this._extShapeSize = HadoopUtils.calcTotalSize(this._extractionShape);
-    LOG.info("Reduce(): " + task.getId() + " of " + numReducers + 
+    LOG.info("Combine(): " + task.getId() + " of " + numReducers + 
                     " write corner: " +  Arrays.toString(outputCornerForThisReducer) + 
                     " shape: " + Arrays.toString(outputShapeForThisReducer) + 
                     " totalOutputSpace: " + Arrays.toString(totalGlobalOutputSpace));
@@ -97,10 +97,6 @@ public class WeightedAverageReducerFloat extends
       System.out.println("\t\tpost merge value: " + waRes.getCurrentValueFloat() +
                          " count: " + waRes.getCurrentCount());
     }
-
-    System.out.println("accum: " + waRes.getCurrentValue() + " nlon: " + _extractionShape[2]);
-    // now that we've combined all of the values, divide by the number of lon elements
-    waRes.computeFinalResultViaDivisor(2.0f * _extractionShape[2]);
 
     System.out.println("context.write() key: " + key +
                        " value: " + waRes.getCurrentValue() +

@@ -1,6 +1,8 @@
 package edu.ucsc.srl.damasc.hadoop;
 
 import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.net.URI;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -1741,5 +1744,33 @@ public class Utils {
     }
 
     return retClass;
+  }
+
+  public static float[] loadWeightsFile(String weightsFile, int numWeights)
+  {
+    Scanner scanner = null;
+    float[] weights = new float[numWeights];
+
+    try {
+      scanner = new Scanner(new File(weightsFile));
+      int i=0;
+
+      while(scanner.hasNextFloat())
+      {
+        weights[i++] = scanner.nextFloat();
+      }
+
+    } catch (FileNotFoundException fnfe)
+    {
+      System.out.println("Caught an fnfe: " + fnfe.toString());
+    } finally {
+      scanner.close();
+    }
+
+    if (scanner != null) {
+      scanner.close();
+    }
+
+    return weights;
   }
 }
