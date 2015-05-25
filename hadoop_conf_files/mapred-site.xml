@@ -37,7 +37,7 @@
   <property>
     <name>mapred.dependency_scheduling</name>
     <!-- <value>true</value> -->
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>mapred.reduce.parallel.copies</name>
