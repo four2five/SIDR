@@ -38,11 +38,13 @@ import edu.ucsc.srl.damasc.hadoop.reduce.MedianReducerShort;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
+import java.util.Arrays;
+
 import ucar.ma2.DataType;
 
 public class Median extends Configured implements Tool {
 
-	public int run(String[] args) throws Exception {
+    public int run(String[] args) throws Exception {
 
     System.out.println(" in netcdf_hdfs.Median.run(), args len: " + args.length + " args content ");
 
@@ -50,10 +52,10 @@ public class Median extends Configured implements Tool {
       System.out.println(args[i]);
     }
 
-		if (args.length != 2) {
-			System.err.println("Usage: netcdf_hdfs_median <input> <output>");
-			System.exit(2);
-		}
+    if (args.length != 2) {
+        System.err.println("Usage: netcdf_hdfs_median <input> <output>");
+        System.exit(2);
+    }
 
     Path inputPath = new Path(args[0]);
     Path outputPath = new Path(args[1]);
@@ -61,7 +63,7 @@ public class Median extends Configured implements Tool {
 
     NetCDFHDFSTools netcdfTools = new NetCDFHDFSTools();
 
-		Configuration conf = getConf();
+        Configuration conf = getConf();
     String jobNameString = "Median ";
 
     // get the buffer size
@@ -73,6 +75,16 @@ public class Median extends Configured implements Tool {
     int[] variableShape =  NetCDFHDFSTools.getVariableShape( inputPath.toString(), 
                                  variableName, conf); 
     System.out.println("Variable name: " + variableName);
+
+    int[] extractionShape = Utils.getExtractionShape(conf);
+    System.out.println("Extraction shape: " + Arrays.toString(extractionShape));
+
+    if (variableShape.length != extractionShape.length) {
+        System.out.println("Configured extraction shape is a different length than " + 
+                           " the observed variable length. " + variableShape.length + 
+                           " != " + extractionShape.length);
+        System.exit(-2);
+    }
 
     int numReducers = 1;
 
@@ -118,9 +130,9 @@ public class Median extends Configured implements Tool {
       job.setMapperClass(MedianMapperInt.class);
       job.setReducerClass(MedianReducerInt.class);
 
-	    // mapper output
-	    job.setMapOutputKeyClass(ArraySpec.class);
-	    job.setMapOutputValueClass(HolisticResultInt.class);
+        // mapper output
+        job.setMapOutputKeyClass(ArraySpec.class);
+        job.setMapOutputValueClass(HolisticResultInt.class);
 
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
@@ -129,9 +141,9 @@ public class Median extends Configured implements Tool {
       job.setMapperClass(MedianMapperShort.class);
       job.setReducerClass(MedianReducerShort.class);
 
-	    // mapper output
-	    job.setMapOutputKeyClass(ArraySpec.class);
-	    job.setMapOutputValueClass(HolisticResultShort.class);
+        // mapper output
+        job.setMapOutputKeyClass(ArraySpec.class);
+        job.setMapOutputValueClass(HolisticResultShort.class);
 
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
@@ -140,9 +152,9 @@ public class Median extends Configured implements Tool {
       job.setMapperClass(MedianMapperDouble.class);
       job.setReducerClass(MedianReducerDouble.class);
 
-	    // mapper output
-	    job.setMapOutputKeyClass(ArraySpec.class);
-	    job.setMapOutputValueClass(HolisticResultDouble.class);
+        // mapper output
+        job.setMapOutputKeyClass(ArraySpec.class);
+        job.setMapOutputValueClass(HolisticResultDouble.class);
 
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
@@ -151,15 +163,15 @@ public class Median extends Configured implements Tool {
       job.setMapperClass(MedianMapperFloat.class);
       job.setReducerClass(MedianReducerFloat.class);
 
-	    // mapper output
-	    job.setMapOutputKeyClass(ArraySpec.class);
-	    job.setMapOutputValueClass(HolisticResultFloat.class);
+        // mapper output
+        job.setMapOutputKeyClass(ArraySpec.class);
+        job.setMapOutputValueClass(HolisticResultFloat.class);
 
       // reducer output
       job.setOutputKeyClass(ArraySpec.class);
       job.setOutputValueClass(HolisticResultFloat.class);
     }
-	
+    
 
     job.setInputFormatClass(NetCDFHDFSFileInputFormat.class);
     //job.setOutputFormatClass(TextOutputFormat.class);
@@ -181,20 +193,20 @@ public class Median extends Configured implements Tool {
     String partitionerType = job.getPartitionerClass().getCanonicalName();
     System.out.println("Partitioner: " + partitionerType);
 
-		if ( Utils.useCombiner(conf) ) {
-			jobNameString += " with combiner ";
+        if ( Utils.useCombiner(conf) ) {
+            jobNameString += " with combiner ";
       if (DataType.INT == dataType) { 
-			  job.setCombinerClass(MedianCombinerInt.class);
+              job.setCombinerClass(MedianCombinerInt.class);
       } else if (DataType.SHORT == dataType) { 
-			  job.setCombinerClass(MedianCombinerShort.class);
+              job.setCombinerClass(MedianCombinerShort.class);
       } else if (DataType.DOUBLE == dataType) { 
-			  job.setCombinerClass(MedianCombinerDouble.class);
+              job.setCombinerClass(MedianCombinerDouble.class);
       } else if (DataType.FLOAT == dataType) { 
-			  job.setCombinerClass(MedianCombinerFloat.class);
+              job.setCombinerClass(MedianCombinerFloat.class);
       } else { 
         System.out.println("!!!! ERROR: a combiner was specified but one is not available for this data type");
       }
-		}
+        }
 
     if( Utils.noScanEnabled(conf) ) 
       jobNameString += " with noscan ";
@@ -216,11 +228,11 @@ public class Median extends Configured implements Tool {
     job.waitForCompletion(true);
 
     return 0;
-	}
+    }
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
     System.out.println("in netcdf_hdfs.Median.main()");
-		int res = ToolRunner.run(new Configuration(), new Median(), args);
-		System.exit(res);
-	}
+        int res = ToolRunner.run(new Configuration(), new Median(), args);
+        System.exit(res);
+    }
 }

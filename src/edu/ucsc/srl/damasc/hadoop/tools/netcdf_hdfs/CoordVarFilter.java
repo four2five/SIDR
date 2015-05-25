@@ -30,6 +30,7 @@ import edu.ucsc.srl.damasc.hadoop.partition.PerFileArraySpecPartitioner;
 import edu.ucsc.srl.damasc.hadoop.reduce.CoordVarFilterReducer;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
@@ -107,6 +108,16 @@ public class CoordVarFilter extends Configured implements Tool {
                                 inputFiles[0].getPath().toString(), 
                                 variableName, conf); 
     System.out.println("Variable name: " + variableName);
+
+    int[] extractionShape = Utils.getExtractionShape(conf);
+    System.out.println("Extraction shape: " + Arrays.toString(extractionShape));
+
+    if (variableShape.length != extractionShape.length) {
+        System.out.println("Configured extraction shape is a different length than " + 
+                           " the observed variable length. " + variableShape.length + 
+                           " != " + extractionShape.length);
+        System.exit(-2);
+    }
 
     int numReducers = 1;
 

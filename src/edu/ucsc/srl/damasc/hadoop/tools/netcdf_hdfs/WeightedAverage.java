@@ -38,6 +38,7 @@ import edu.ucsc.srl.damasc.hadoop.reduce.WeightedAverageReducerFloat;
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import ucar.ma2.DataType;
 
@@ -74,6 +75,16 @@ public class WeightedAverage extends Configured implements Tool {
     int[] variableShape =  NetCDFHDFSTools.getVariableShape( inputPath.toString(), 
                                  variableName, conf); 
     System.out.println("Variable name: " + variableName);
+
+    int[] extractionShape = Utils.getExtractionShape(conf);
+    System.out.println("Extraction shape: " + Arrays.toString(extractionShape));
+
+    if (variableShape.length != extractionShape.length) {
+        System.out.println("Configured extraction shape is a different length than " + 
+                           " the observed variable length. " + variableShape.length + 
+                           " != " + extractionShape.length);
+        System.exit(-2);
+    }
 
     String weightsFileName = Utils.getWeightsFileName(conf);
     if (weightsFileName.compareTo("") != 0)

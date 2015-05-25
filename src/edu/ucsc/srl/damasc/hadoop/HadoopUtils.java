@@ -176,6 +176,30 @@ public class HadoopUtils {
       return variableShape.clone();
     }
 
+    public static int[] getExtractionShape(Configuration conf) {
+      String dimString = conf.get(EXTRACTION_SHAPE, "");
+      // sanity checking
+      if (dimString == "") { 
+        return null;
+      } else { 
+        String openB = Pattern.quote("[");
+        String closeB = Pattern.quote("]");
+        dimString = dimString.replaceAll(openB,"");
+        dimString = dimString.replaceAll(closeB,"");
+        dimString = dimString.replaceAll("\\s+", "");
+      }
+
+      //System.out.println("JB, here's that string" + dimString);
+      String[] dimStrings = dimString.split(",");
+      variableShape = new int[dimStrings.length];
+
+      for( int i=0; i<variableShape.length; i++) {
+        variableShape[i] = Integer.parseInt(dimStrings[i]);
+      }
+
+      return variableShape.clone();
+    }
+
     /**
      * Get the name of the variable currently being processed
      * @param conf Configuration object for the current job

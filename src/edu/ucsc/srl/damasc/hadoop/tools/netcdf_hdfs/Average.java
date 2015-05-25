@@ -33,6 +33,8 @@ import edu.ucsc.srl.damasc.hadoop.reduce.AverageReducerShort;
 
 import edu.ucsc.srl.damasc.hadoop.io.input.NetCDFHDFSFileInputFormat;
 
+import java.util.Arrays;
+
 import ucar.ma2.DataType;
 
 public class Average extends Configured implements Tool {
@@ -68,6 +70,16 @@ public class Average extends Configured implements Tool {
     int[] variableShape =  NetCDFHDFSTools.getVariableShape( inputPath.toString(), 
                                  variableName, conf); 
     System.out.println("Variable name: " + variableName);
+
+    int[] extractionShape = Utils.getExtractionShape(conf);
+    System.out.println("Extraction shape: " + Arrays.toString(extractionShape));
+
+    if (variableShape.length != extractionShape.length) {
+        System.out.println("Configured extraction shape is a different length than " + 
+                           " the observed variable length. " + variableShape.length + 
+                           " != " + extractionShape.length);
+        System.exit(-2);
+    }
 
     int numReducers = 1;
 
