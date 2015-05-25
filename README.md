@@ -14,7 +14,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
 
 1. `sudo apt-get install ant-contrib build-essential git maven python-software-properties autoconf libtool`
     * export CLASSPATH=$CLASSPATH:/usr/share/java/ant-contrib.jar
-2. install java 7 (we use oracle’s, you can try openjdk if you want)
+2. install java 8 (we use oracle’s, you can try openjdk if you want)    
     `sudo add-apt-repository ppa:webupd8team/java;`  
     `sudo apt-get update;`   
     `sudo apt-get install oracle-java8-installer;`
@@ -34,7 +34,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export NETCDF_HOME=/home/buck/git/thredds    
     * export NETCDF_JAR=netcdf-4.3.18.jar    
     * export CLASSPATH=$CLASSPATH:$NETCDF_HOME/cdm/target/$NETCDF_JAR    
-5. get our patched version of Hadoop (only necessary for the early results work)
+5. get our patched version of Hadoop (only necessary for the early results work)    
    `cd ../`   
    `git clone https://github.com/four2five/hadoop-common.git`   
    `cd hadoop-common`    
@@ -44,6 +44,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
     * export HADOOP_HOME=/home/buck/git/hadoop-common    
     * export HADOOP_JAR=hadoop-core-1.0.4-early-results.jar    
     * export PATH=$PATH:$HADOOP_HOME/bin    
+    * NOTE: There are some example hadoop configuration files in the SIDR repo that you will check out in the next step. Take a look at those for examples of how we configure our nodes.
 6. get the SIDR code (updated version of our SciHadoop code)     
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
