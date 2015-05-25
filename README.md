@@ -49,7 +49,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `cd ../`    
    `git clone https://github.com/four2five/SIDR.git`    
    `cd SIDR`     
-   `git checkout sc13_experiments_improved`    
+   `git checkout 0.2.0`    
    `ant netcdf_hdfs jar`    
     * export SCIHADOOP_HOME=/home/buck/git/SIDR    
     * export SCIHADOOP_JAR=SIDR.jar    
