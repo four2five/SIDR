@@ -1,13 +1,12 @@
-SIDR
+SIDR 0.2.0
 ====
 
-This code was used for the experimental portion of the SC '13 paper: http://sc13.supercomputing.org/schedule/event_detail.php?evid=pap313
-
-We're working on a more feature complete version of this code that should be posted shortly (Oct 2013).
+This code is based on that used for the experimental portion of the SC '13 paper: http://sc13.supercomputing.org/schedule/event_detail.php?evid=pap313
+Since then we have added some functionality and bug fixes.
 
 Installation 
 ====
-These instructions worked on Ubuntu 12.04. YMMV.
+These instructions worked on Ubuntu 14.04. YMMV.
 
 I tend to put the export commands into my .bashrc file so that they're persistent.
 
@@ -18,8 +17,8 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
 2. install java 7 (we use oracle’s, you can try openjdk if you want)
     `sudo add-apt-repository ppa:webupd8team/java;`  
     `sudo apt-get update;`   
-    `sudo apt-get install oracle-java7-installer;`   
-    * export JAVA_HOME=/usr/lib/jvm/java-7-oracle     
+    `sudo apt-get install oracle-java8-installer;`
+    * export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 3. Create a directory to build the code in:   
     `mkdir git`                                  
     `cd git`   
@@ -41,7 +40,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
    `cd hadoop-common`    
    `git checkout buck_early_results_sc13`    
    `ant mvn-install examples`    
-   * Configure hadoop however you want. Make sure that it works with wordcount (or some other comparable test ). I like this tutorial: http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/    
+   * Configure hadoop however you want. Make sure that it works with wordcount (or some other comparable test ). I like this tutorial: http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-multi-node-cluster/
     * export HADOOP_HOME=/home/buck/git/hadoop-common    
     * export HADOOP_JAR=hadoop-core-1.0.4-early-results.jar    
     * export PATH=$PATH:$HADOOP_HOME/bin    
@@ -56,7 +55,7 @@ The hadoop_conf_files directory contains the configuration files I use to run SI
   * Check out the files in the hadoop_conf_files directory. You will want to use these as a template for your hadoop configuration files (especially the HADOOP_CLASSPATH lines)
 7. generate test data    
   * NOTE: this will generate several files, one per data type supported. Only test against one of these files at a time
-   `cd tools`    
+   `cd tools/file_generator/`
    `ant jar`    
    `ant run`    
    `hadoop dfs -mkdir netcdf_input`    
