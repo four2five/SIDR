@@ -5,7 +5,7 @@
 #$HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output_short/
 #$HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output_int/
 #$HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output_double/
-$HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output_float/
+$HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output/
 
 # run the job over shorts
 #$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed2 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input_short/file1.nc /user/buck/netcdf_output_short
@@ -17,6 +17,6 @@ $HADOOP_HOME/bin/hadoop dfs -rmr netcdf_output_float/
 #$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed3 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input_double/file1.nc /user/buck/netcdf_output_double
 
 # run the job over doubles
-$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed4 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input_float/file4.nc /user/buck/netcdf_output_float
+$HADOOP_HOME/bin/hadoop jar $SCIHADOOP_HOME/build/jar/SIDR.jar netcdf_hdfs_median -D damasc.extraction_shape=2,36,36,10 -D damasc.partition_mode=record -D damasc.placement_mode=sampling -D damasc.query_dependant=false -D damasc.number_reducers=1 -D damasc.variable_name=windspeed1 -D damasc.buffer_size=4194304 -D damasc.logfile=/tmp/damasc_log.txt -D damasc.scihadoop=true -D damasc.reducer.dynamic_start=false -D damasc.sample_ratio=0.0001 -D damasc.partitioner_class=arrayspec /user/buck/netcdf_input/file1.nc /user/buck/netcdf_output
 
 

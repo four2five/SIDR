@@ -10,7 +10,7 @@
 
 # Extra Java CLASSPATH elements.  Optional.
 # export HADOOP_CLASSPATH=
-export JAVA_HOME=/usr/lib/jvm/java-7-oracle/
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle/
 export HADOOP_OPTS=-Djava.net.preferIPv4Stack=true
 export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$NETCDF_HOME/cdm/target/$NETCDF_JAR
 export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$SCIHADOOP_HOME/build/jar/$SCIHADOOP_JAR
