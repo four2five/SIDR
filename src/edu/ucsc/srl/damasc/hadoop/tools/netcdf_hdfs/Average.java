@@ -158,6 +158,7 @@ public class Average extends Configured implements Tool {
       job.setMapperClass(AverageMapperFloat.class);
       job.setReducerClass(AverageReducerFloat.class);
 
+      System.out.println("Setting MapOutput to be Floats");
 	    // mapper output
 	    job.setMapOutputKeyClass(ArraySpec.class);
 	    job.setMapOutputValueClass(AverageResultFloat.class);

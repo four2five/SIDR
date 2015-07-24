@@ -23,7 +23,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 
 import edu.ucsc.srl.damasc.hadoop.io.ArraySpec;
 import edu.ucsc.srl.damasc.hadoop.io.DoubleTypedResult;
@@ -1709,22 +1708,6 @@ public class Utils {
     } else { 
       System.err.println("Could not determine the size in Utils.getDataTypeSize()");
     }
-
-    /*
-    if (inputClass.getSimpleName().equals("ShortWritable")){ 
-      retVal = 2;
-    } else if (inputClass.getSimpleName().equals("IntWritable")){ 
-      retVal = 4;
-    } else if (inputClass.getSimpleName().equals("LongWritable")){ 
-      retVal = 8;
-    } else if (inputClass.getSimpleName().equals("HolisticResultShort")){ 
-      retVal = 2;
-    } else if (inputClass.getSimpleName().equals("HolisticResultInt")){ 
-      retVal = 4;
-    } else if (inputClass.getSimpleName().equals("HolisticResultLong")){ 
-      retVal = 8;
-    }
-    */
 
     return retVal;
   }
